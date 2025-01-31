@@ -1,24 +1,43 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Environment Files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # Logs
-logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Build directories
+build/
+dist/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# System Files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# IDE files (VS Code, JetBrains, etc.)
+.vscode/
+.idea/
+
+# OS-specific files
+*.swp
+*~
+*.bak
+
+# Package lock files (only if you are using Yarn or pnpm, not npm)
+# yarn.lock
+# pnpm-lock.yaml
+
+# Coverage directory for test reports
+coverage/
+
+# Frontend Build Output (e.g., Vite, React, Next.js, etc.)
+public/
