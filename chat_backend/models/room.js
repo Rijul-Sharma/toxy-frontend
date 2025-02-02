@@ -5,6 +5,13 @@ const roomSchema  = Schema({
         type:String,
         required: true
     },
+    description:{
+        type:String,
+    },
+    admin:{
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'user',

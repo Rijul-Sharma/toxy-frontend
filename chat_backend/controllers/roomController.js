@@ -4,12 +4,15 @@ import mongoose from "mongoose";
 
 export const createRoom = async (req,res) => {
     try{
-        const { user_id, room_name} = req.body;
+        const { user_id, room_name, room_desc} = req.body;
         console.log(user_id,'ui')
         console.log(room_name,'rn')
+        console.log(room_desc, 'rd')
         const newRoom = new roomModel({
             name : room_name,
             createdBy: user_id,
+            description: room_desc,
+            admin: user_id,
             createdAt: new Date(),
             users: [user_id],
         })
@@ -102,6 +105,9 @@ export const exitRoom = async (req,res) => {
         room.users.map(user=>console.log(userId === user._id))
         room.users = room.users.filter(user => user._id.toString() !== userId);
         await room.save();
+        if (room.users.length === 0) {
+            await roomModel.deleteOne({ _id: room._id });
+        }
         user.rooms = user.rooms.filter(room => room._id.toString() !== roomId);
         await user.save();
 
@@ -120,7 +126,7 @@ export const getRoomInfo = async (req,res) => {
     const { roomId } = req.query;
 
     try {
-        const room = await roomModel.findOne({ _id : roomId}).populate('createdBy').populate('users');
+        const room = await roomModel.findOne({ _id : roomId}).populate('createdBy').populate('users').populate('admin');
         console.log(room, 'room hai')
         if(!room){
             return res.status(404).json({ message: 'Room not found'});
