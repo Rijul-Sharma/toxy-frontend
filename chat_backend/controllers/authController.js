@@ -3,10 +3,10 @@ import roomModel from "../models/room.js";
 
 export const Signup = async (req,res) => {
     try {
-        const {username, password} = req.body;
-        const newUser = new userModel({ username, password})
+        const {email, name, password} = req.body;
+        const newUser = new userModel({ email, name, password})
         await newUser.save();
-        res.status(200).json({ response: 'User saved successfully'})
+        res.status(200).json(newUser)
 
     } catch (err) {
         console.log(err)
