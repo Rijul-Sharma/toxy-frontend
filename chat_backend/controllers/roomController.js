@@ -137,3 +137,43 @@ export const getRoomInfo = async (req,res) => {
         return res.status(500).json({ error : err})
     }
 }
+
+
+
+export const changeAdmin = async (req,res) => {
+    const { room_id, newAdmin } = req.body;
+    try {
+        const room = await roomModel.findOne({_id : room_id});
+        room.admin = newAdmin;
+        await room.save();
+        return res.status(200).json({
+            response: room,
+            message: "Room Admin Changed Successfully!"
+        })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ error : err})
+    }
+}
+
+
+export const kickMember = async (req,res) => {
+    const { room_id, member } = req.body;
+    try {
+        const room = await roomModel.findOne({_id : room_id});
+        room.users = room.users.filter(user => user._id.toString() !== member._id);
+        await room.save();
+
+        const user = await userModel.findOne({_id : member._id})
+        user.rooms = user.rooms.filter(room => room._id.toString() !== room_id);
+        await user.save()
+        return res.status(200).json({
+            response: room,
+            message: "Member Kicked Out of the Room Successfully!"
+        })
+        
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ error : err})
+    }
+}

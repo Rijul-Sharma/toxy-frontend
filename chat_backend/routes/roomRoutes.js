@@ -1,5 +1,5 @@
 import express from 'express'
-import { createRoom, joinRoom, exitRoom, getRoomInfo } from '../controllers/roomController.js'
+import { createRoom, joinRoom, exitRoom, getRoomInfo, changeAdmin, kickMember } from '../controllers/roomController.js'
 
 const router = express.Router()
 
@@ -8,5 +8,7 @@ router.post('/join', joinRoom)
 // router.get('/getUsers', getRoomUsers)
 router.delete('/exit', exitRoom)
 router.get(`/info`, getRoomInfo)
+router.post(`/admin`, changeAdmin)
+router.post(`/kick`, kickMember)
 
 export default router
