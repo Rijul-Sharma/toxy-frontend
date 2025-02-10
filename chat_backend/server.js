@@ -6,6 +6,7 @@ import messageRoutes from './routes/messageRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import roomRoutes from './routes/roomRoutes.js'
+import imageRoutes from './routes/imageRoutes.js'
 import cors from 'cors'
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
@@ -46,6 +47,7 @@ app.use("/api/message", messageRoutes)
 app.use("/api/user", userRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/room", roomRoutes)
+app.use("/api/image", imageRoutes)
 
 setupSocketEvents(io)
 
