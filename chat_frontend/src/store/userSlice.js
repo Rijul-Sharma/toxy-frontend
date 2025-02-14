@@ -5,8 +5,8 @@ const initialState = {
         email : '',
         name : '',
         rooms : [],
-        selectedRoom : ''
-
+        selectedRoom : '',
+        icon : ''
 }
 
 export const UserSlice = createSlice({
@@ -18,6 +18,10 @@ export const UserSlice = createSlice({
             state.email = action.payload.email;
             state.name = action.payload.name;
             state.rooms = action.payload.rooms;
+            state.icon = action.payload.icon;
+        },
+        updateIcon : (state,action) => {
+            state.icon = action.payload
         },
         updateSelectedRoom : (state,action) => {
             state.selectedRoom = action.payload
@@ -32,6 +36,6 @@ export const UserSlice = createSlice({
     }
 })  
 
-export const {loginSuccess, updateSelectedRoom, updateRooms, exitRoom} = UserSlice.actions
+export const {loginSuccess, updateIcon, updateSelectedRoom, updateRooms, exitRoom} = UserSlice.actions
 
 export default UserSlice.reducer
