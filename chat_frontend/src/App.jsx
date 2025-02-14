@@ -6,7 +6,8 @@ import Login from './pages/Login.jsx'
 import Chats from './pages/chats.jsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { useCookies } from 'react-cookie'
-import { loginSuccess } from '../store/userSlice.js'
+import { loginSuccess } from './store/userSlice.js'
+import Signup from './pages/Signup.jsx'
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/login' element={<Login/>}/>
+        <Route path='/signup' element={<Signup/>}/>
         <Route path='/chats' element= {<Chats/>}/>
       </Routes>
     </BrowserRouter>
