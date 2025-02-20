@@ -126,12 +126,38 @@ export const getRoomInfo = async (req,res) => {
     const { roomId } = req.query;
 
     try {
-        const room = await roomModel.findOne({ _id : roomId}).populate('createdBy').populate('users').populate('admin');
+        const room = await roomModel.findOne({ _id : roomId}).populate('createdBy').populate('users').populate('admin').populate('icon');
         console.log(room, 'room hai')
         if(!room){
             return res.status(404).json({ message: 'Room not found'});
         }
         return res.status(200).json(room)
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ error : err})
+    }
+}
+
+
+export const getRooms = async (req,res) => {
+    try {
+        const { roomIds } = req.body;
+        console.log(req.body, 'rb')
+        const rooms = await roomModel.find({_id : { $in : roomIds }})
+        .populate('createdBy')
+        .populate('users')
+        .populate({
+            path: 'users',
+            populate : { path : 'icon'}
+        })
+        .populate('admin')
+        .populate('icon')
+        .populate('lastMessage')
+        .populate({
+            path: 'lastMessage',
+            populate : { path: 'sender'}
+        })
+        return res.status(200).json(rooms)
     } catch (err) {
         console.log(err)
         return res.status(500).json({ error : err})
@@ -172,6 +198,21 @@ export const kickMember = async (req,res) => {
             message: "Member Kicked Out of the Room Successfully!"
         })
         
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ error : err})
+    }
+}
+
+
+export const editRoom = async (req,res) => {
+    const {roomId, newName, newDesc} = req.body;
+    try{
+        const room = await roomModel.findOne({_id : roomId})
+        room.name = newName;
+        room.description = newDesc;
+        await room.save();
+        return res.status(200).json({ response: room, message: "Room Updated Successfully!"})
     } catch (err) {
         console.log(err)
         return res.status(500).json({ error : err})
