@@ -126,7 +126,15 @@ export const getRoomInfo = async (req,res) => {
     const { roomId } = req.query;
 
     try {
-        const room = await roomModel.findOne({ _id : roomId}).populate('createdBy').populate('users').populate('admin').populate('icon');
+        const room = await roomModel.findOne({ _id : roomId})
+        .populate('createdBy')
+        .populate('users')
+        .populate('admin')
+        .populate({
+            path: 'users',
+            populate : { path : 'icon'}
+        })
+        .populate('icon')
         console.log(room, 'room hai')
         if(!room){
             return res.status(404).json({ message: 'Room not found'});
@@ -167,10 +175,10 @@ export const getRooms = async (req,res) => {
 
 
 export const changeAdmin = async (req,res) => {
-    const { room_id, newAdmin } = req.body;
+    const { room_id, newAdminId } = req.body;
     try {
         const room = await roomModel.findOne({_id : room_id});
-        room.admin = newAdmin;
+        room.admin = newAdminId;
         await room.save();
         return res.status(200).json({
             response: room,
@@ -184,13 +192,13 @@ export const changeAdmin = async (req,res) => {
 
 
 export const kickMember = async (req,res) => {
-    const { room_id, member } = req.body;
+    const { room_id, memberId } = req.body;
     try {
         const room = await roomModel.findOne({_id : room_id});
-        room.users = room.users.filter(user => user._id.toString() !== member._id);
+        room.users = room.users.filter(user => user._id.toString() !== memberId);
         await room.save();
 
-        const user = await userModel.findOne({_id : member._id})
+        const user = await userModel.findOne({_id : memberId})
         user.rooms = user.rooms.filter(room => room._id.toString() !== room_id);
         await user.save()
         return res.status(200).json({
