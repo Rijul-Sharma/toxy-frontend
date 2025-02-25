@@ -27,7 +27,7 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT
 
-const dbURL = process.env.MONGO_URL;
+const dbURL = process.env.MONGO_URI;
 
 mongoose.connect(dbURL)
     .then(() => console.log("Connected to MongoDB successfully!"))
