@@ -17,6 +17,10 @@ const userSchema = Schema({
     rooms : {
         type: [Schema.Types.ObjectId],
         ref: 'room'
+    },
+    icon : {
+        type: Schema.Types.ObjectId,
+        ref: 'image'
     }
     },
     { versionKey: false }

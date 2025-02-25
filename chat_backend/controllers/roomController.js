@@ -44,7 +44,7 @@ export const joinRoom = async (req,res) => {
         }
 
         const room = await roomModel.findOne({_id : room_id});
-        if(!room) res.status(404).json({response : "Room not found"})
+        if(!room) return res.status(404).json({response : "Room not found"})
         if (room.users.includes(user_id)) {
             return res.status(400).json({ response: "User is already a part of this room" });
         }
@@ -68,23 +68,6 @@ export const joinRoom = async (req,res) => {
     }
     
 }
-
-
-// export const getRoomUsers = async (req,res) => {
-//     try {
-//         const {roomId} = req.body;
-//         console.log(req.body)
-//         const room = await roomModel.findOne({_id : roomId})
-//         if(!room) res.status(404).json({response : "Room not found"})
-//         let users = room.users.map((e) => e._id)
-//         console.log(users,'room users');
-//         res.status(200).json(users)
-        
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({error : err.message})
-//     }
-// }
 
 
 export const exitRoom = async (req,res) => {

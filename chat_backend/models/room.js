@@ -23,6 +23,14 @@ const roomSchema  = Schema({
     users: {
         type: [Schema.Types.ObjectId],
         ref: 'user'
+    },
+    icon: {
+        type: Schema.Types.ObjectId,
+        ref: 'image'
+    },
+    lastMessage: {
+        type: Schema.Types.ObjectId,
+        ref: 'message'
     }
     },
     { versionKey: false }
