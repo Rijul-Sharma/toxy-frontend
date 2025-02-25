@@ -19,7 +19,7 @@ app.use(cors());
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: 'https://toxy-indol.vercel.app',
+        origin: '*',
         methods: ['GET', 'POST'],
         allowedHeaders: ['Content-Type']
       }
