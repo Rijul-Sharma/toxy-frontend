@@ -12,9 +12,9 @@ const fetchData = async (url, method = 'GET', data = null) => {
           body
       });
 
-      if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-      }
+    //   if (!response.ok) {
+    //       throw new Error(`HTTP error! status: ${response.status}`);
+    //   }
 
       return response
   } catch (error) {

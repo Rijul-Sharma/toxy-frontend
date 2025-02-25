@@ -7,7 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        bree : ["Bree Serif", "sans-serif"]
+        bree : ["Bree Serif", "sans-serif"],
+        bebas : ["Bebas Neue", "sans-serif"],
+        oswald : ["Oswald", 'sans-serif']
       }
     },
   },

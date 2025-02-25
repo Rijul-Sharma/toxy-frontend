@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import React from 'react'
 import './App.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import Chats from './pages/chats.jsx'
 import { useSelector, useDispatch } from 'react-redux'
@@ -14,15 +14,16 @@ function App() {
   const [count, setCount] = useState(0)
   const dispatch = useDispatch();
   const abc = useSelector((st) => st);
-  const [cookie, setCookie] = useCookies('userInfo')
+  const [cookie, setCookie] = useCookies(['userInfo'])
+  const userInfo = cookie.userInfo;
+
   
   useEffect(() => {
     console.log(abc)
   },)
   
   useEffect(() => {
-    // console.log(cookie)
-    if(cookie){
+    if(userInfo){
       console.log(cookie.userInfo)
       dispatch(loginSuccess(cookie.userInfo || {}))
     }
@@ -32,9 +33,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/login' element={<Login/>}/>
-        <Route path='/signup' element={<Signup/>}/>
-        <Route path='/chats' element= {<Chats/>}/>
+        <Route path='/' element= {userInfo ? <Navigate to="/chats" /> : <Navigate to="/login" />}/>
+        <Route path='/login' element={userInfo ? <Navigate to="/chats" /> : <Login />}/>
+        <Route path='/signup' element={userInfo ? <Navigate to="/chats" /> : <Signup/>}/>
+        <Route path='/chats' element= {userInfo ? <Chats/> : <Navigate to="/login" />}/>
       </Routes>
     </BrowserRouter>
   )

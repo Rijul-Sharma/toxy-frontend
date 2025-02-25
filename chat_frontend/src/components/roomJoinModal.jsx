@@ -20,14 +20,14 @@ const RoomJoinModal = ({ isOpen, onClose }) => {
     
     if (selection === 1) {
       // Join Room
-      res = await _fetch(`http://localhost:5000/api/room/join`, 'POST', {
+      res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/join`, 'POST', {
         user_id: user._id,
         room_id: ipRoomId
       })
       setIpRoomId('')
     } else {
       // Create Room
-      res = await _fetch(`http://localhost:5000/api/room/create`, 'POST', {
+      res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/create`, 'POST', {
         user_id: user._id,
         room_name: ipRoomName,
         room_desc: ipRoomDesc
@@ -43,7 +43,7 @@ const RoomJoinModal = ({ isOpen, onClose }) => {
 
     const updatedCookie = {
       ...cookie.userInfo,
-      rooms: [...(cookie.userInfo?.rooms || []), a.response],
+      rooms: [...(cookie.userInfo?.rooms || []), a.response._id],
     };
     setCookie('userInfo', updatedCookie, { path: '/' })
     onClose()
@@ -61,8 +61,8 @@ const RoomJoinModal = ({ isOpen, onClose }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className='flex flex-col gap-8 w-full max-w-md'>
+    <Modal isOpen={isOpen} onClose={onClose} width='w-[85vw] sm:w-[400px]'>
+      <div className='flex flex-col gap-8 w-full max-w-md mx-auto'>
         {/* Tab Selection */}
         <div className='flex w-full border-b-2 border-gray-300'>
           <div 
