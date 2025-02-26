@@ -90,6 +90,17 @@ const Chats = () => {
   }, [user._id, user.rooms])
 
   useEffect(() => {
+    if (user._id && cookie.userInfo && JSON.stringify(user.rooms) !== JSON.stringify(cookie.userInfo.rooms)) {
+      const updatedCookie = {
+        ...cookie.userInfo,
+        rooms: [...user.rooms]
+      };
+      setCookie('userInfo', updatedCookie, { path: '/' });
+    }
+  }, [user.rooms, cookie.userInfo, setCookie, user._id]);
+  
+
+  useEffect(() => {
     socket.on('roomUpdate', (roomId) => {
       console.log('roomUpdate event received for room:', roomId);
       fetchRooms();

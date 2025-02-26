@@ -35,17 +35,21 @@ const RoomJoinModal = ({ isOpen, onClose }) => {
       setIpRoomName('')
       setIpRoomDesc('')
     }
-    
-    const a = await res.json();
-    dispatch(updateRooms(a.response._id))
-    console.log(a.response, 'yeh wala hai')
-    socket.emit('roomUpdate', a.response._id)
 
-    const updatedCookie = {
-      ...cookie.userInfo,
-      rooms: [...(cookie.userInfo?.rooms || []), a.response._id],
-    };
-    setCookie('userInfo', updatedCookie, { path: '/' })
+    // console.log(res.status, 'res status')
+
+    if(res.status === 200){
+      const a = await res.json();
+      dispatch(updateRooms(a.response._id))
+      console.log(a.response, 'yeh wala hai')
+      socket.emit('roomUpdate', a.response._id)
+  
+      const updatedCookie = {
+        ...cookie.userInfo,
+        rooms: [...(cookie.userInfo?.rooms || []), a.response._id],
+      };
+      setCookie('userInfo', updatedCookie, { path: '/' })
+    }
     onClose()
   }
 

@@ -99,29 +99,58 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
     }
   };
 
+  // const handleExitRoom = async () => {
+  //   let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/exit`, 'DELETE', {
+  //     roomId: selectedRoom._id,
+  //     userId: user._id
+  //   })
+  //   const a = await res.json();
+  //   // if(res.status == 200){
+  //   //   console.log(res)
+  //   // }
+  //   console.log(a);
+  //   // socket.emit('roomUpdate', selectedRoom._id)
+  //   console.log(cookie.userInfo, 'old ')
+
+  //   const updatedCookie = {
+  //     ...cookie.userInfo,
+  //     rooms: cookie.userInfo.rooms.filter(room => String(room) !== String(a.response._id)),
+  //   };
+
+  //   // console.log(updatedCookie, 'updated')
+  //   // console.log(a.response._id, 'yeh hai')
+  //   setCookie('userInfo', updatedCookie, { path: '/' });
+  //   console.log(cookie.userInfo, 'new ')
+
+  //   dispatch(exitRoom(a.response._id))
+  //   resetRoom()
+  //   setShowExitModal(false)
+  // }
+
   const handleExitRoom = async () => {
     let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/exit`, 'DELETE', {
       roomId: selectedRoom._id,
       userId: user._id
-    })
+    });
     const a = await res.json();
-    // if(res.status == 200){
-    //   console.log(res)
-    // }
-    console.log(a);
-    socket.emit('roomUpdate', selectedRoom._id)
+    
+    const currentUserInfo = { ...cookie.userInfo };
+    
+    const updatedRooms = currentUserInfo.rooms.filter(
+      roomId => String(roomId) !== String(selectedRoom._id)
+    );
+    
     const updatedCookie = {
-      ...cookie.userInfo,
-      rooms: cookie.userInfo.rooms.filter(room => room !== selectedRoom?._id),
+      ...currentUserInfo,
+      rooms: updatedRooms
     };
-
-    console.log(updatedCookie)
-    console.log(a.response._id, 'yeh hai')
+    
     setCookie('userInfo', updatedCookie, { path: '/' });
-    dispatch(exitRoom(a.response._id))
-    resetRoom()
-    setShowExitModal(false)
-  }
+    
+    dispatch(exitRoom(a.response._id));
+    setShowExitModal(false);
+}
+
 
   const getMessages = async () => {
     if (selectedRoom?._id) {
