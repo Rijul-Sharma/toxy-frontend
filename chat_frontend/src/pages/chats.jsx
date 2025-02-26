@@ -76,7 +76,11 @@ const Chats = () => {
 
   const resetRoom = () => {
     setRoomSearchQuery('')
-    dispatch(updateSelectedRoom(rooms[0]))
+    if (rooms.length > 0) {
+      dispatch(updateSelectedRoom(rooms[0]));
+    } else {
+      dispatch(updateSelectedRoom(null));
+    }
     // setSelectedRoom(rooms[0])
   }
 

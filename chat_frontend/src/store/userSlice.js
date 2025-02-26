@@ -5,7 +5,7 @@ const initialState = {
         email : '',
         name : '',
         rooms : [],
-        selectedRoom : '',
+        selectedRoom : null,
         icon : ''
 }
 
