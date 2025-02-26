@@ -11,47 +11,61 @@ const RoomJoinModal = ({ isOpen, onClose }) => {
   const [ipRoomId, setIpRoomId] = useState('')
   const [ipRoomName, setIpRoomName] = useState('')
   const [ipRoomDesc, setIpRoomDesc] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch()
   const [cookie, setCookie] = useCookies(['userInfo'])
 
   const handleSubmit = async () => {
-    let res;
-    const user = cookie.userInfo;
+    if (isLoading) return;
     
-    if (selection === 1) {
-      // Join Room
-      res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/join`, 'POST', {
-        user_id: user._id,
-        room_id: ipRoomId
-      })
-      setIpRoomId('')
-    } else {
-      // Create Room
-      res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/create`, 'POST', {
-        user_id: user._id,
-        room_name: ipRoomName,
-        room_desc: ipRoomDesc
-      })
-      setIpRoomName('')
-      setIpRoomDesc('')
-    }
+    setIsLoading(true);
 
-    // console.log(res.status, 'res status')
-
-    if(res.status === 200){
-      const a = await res.json();
-      dispatch(updateRooms(a.response._id))
-      console.log(a.response, 'yeh wala hai')
-      socket.emit('roomUpdate', a.response._id)
+    try{
+      let res;
+      const user = cookie.userInfo;
+      
+      if (selection === 1) {
+        // Join Room
+        res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/join`, 'POST', {
+          user_id: user._id,
+          room_id: ipRoomId
+        })
+        setIpRoomId('')
+      } else {
+        // Create Room
+        res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/create`, 'POST', {
+          user_id: user._id,
+          room_name: ipRoomName,
+          room_desc: ipRoomDesc
+        })
+        setIpRoomName('')
+        setIpRoomDesc('')
+      }
   
-      const updatedCookie = {
-        ...cookie.userInfo,
-        rooms: [...(cookie.userInfo?.rooms || []), a.response._id],
-      };
-      setCookie('userInfo', updatedCookie, { path: '/' })
+      // console.log(res.status, 'res status')
+  
+      if(res.status === 200){
+        const a = await res.json();
+        dispatch(updateRooms(a.response._id))
+        console.log(a.response, 'yeh wala hai')
+        socket.emit('roomUpdate', a.response._id)
+    
+        const updatedCookie = {
+          ...cookie.userInfo,
+          rooms: [...(cookie.userInfo?.rooms || []), a.response._id],
+        };
+        setCookie('userInfo', updatedCookie, { path: '/' })
+      }
+      else{
+        console.error('Error creating/joining room', res);
+      }
+      onClose()
+    } catch (err) {
+      console.error('Error in API call:', err);
+    } finally {
+      setIsLoading(false)
     }
-    onClose()
-  }
+  } 
 
   const resetFields = () => {
     setIpRoomId('')
