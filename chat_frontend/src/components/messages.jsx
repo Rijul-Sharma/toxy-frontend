@@ -112,7 +112,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
     socket.emit('roomUpdate', selectedRoom._id)
     const updatedCookie = {
       ...cookie.userInfo,
-      rooms: cookie.userInfo.rooms.filter(room => room._id !== selectedRoom?._id),
+      rooms: cookie.userInfo.rooms.filter(room => room !== selectedRoom?._id),
     };
 
     console.log(updatedCookie)
