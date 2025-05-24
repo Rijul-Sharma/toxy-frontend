@@ -85,7 +85,7 @@ const Chats = () => {
   }
 
   useEffect(() => {
-    console.log('joinRoom called')
+    // console.log('joinRoom called')
     socket.emit('joinRoom', user._id, user.rooms)
   }, [user._id, user.rooms])
 
@@ -102,12 +102,12 @@ const Chats = () => {
 
   useEffect(() => {
     socket.on('roomUpdate', (roomId) => {
-      console.log('roomUpdate event received for room:', roomId);
+      // console.log('roomUpdate event received for room:', roomId);
       fetchRooms();
     });
   
     socket.on('userKicked', ({ roomId, userId }) => {
-      console.log('userKicked event received for room:', roomId, 'user:', userId);
+      // console.log('userKicked event received for room:', roomId, 'user:', userId);
       if (user._id === userId) {
         dispatch(exitRoom(roomId));
         const updatedRooms = cookie.userInfo.rooms.filter(
@@ -137,7 +137,7 @@ const Chats = () => {
 
 
   const handleclick = (item) => {
-    console.log(`Clicked ${item.name}`)
+    // console.log(`Clicked ${item.name}`)
     dispatch(updateSelectedRoom(item))
     // setSelectedRoom(item)
     // console.log(item, 'selected room here')
@@ -213,9 +213,10 @@ const Chats = () => {
               }`} 
               onClick={() => handleclick(room)}
           >
-                {room.icon?.imageData ? (
+                {room.icon?.url ? (
                   <img
-                    src={`data:image/jpeg;base64,${room.icon.imageData}`}
+                    // src={`data:image/jpeg;base64,${room.icon.imageData}`}
+                    src={room.icon.url}
                     alt={room.icon.name}
                     className="h-10 w-10 rounded-full object-cover"
                   />

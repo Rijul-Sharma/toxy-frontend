@@ -5,7 +5,7 @@ import roomModel from "../models/room.js";
 export const getAllMessages = async (req,res) => {
     try{
         const {room_id} = req.query;
-        console.log(room_id)
+        // console.log(room_id)
         let a = await messageModel.find({ room_id })
         .populate('sender')
         // .populate({

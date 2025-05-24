@@ -1,31 +1,36 @@
 import imageModel from '../models/image.js'
 import roomModel from '../models/room.js';
 import userModel from '../models/user.js';
+import { cloudinary } from '../config/cloudinary.js';
 
 export const uploadImage = async (req, res) => {
-    console.log('File:', req.file);
-    console.log('Body:', req.body);
+    // console.log('File:', req.file);
+    // console.log('Body:', req.body);
     
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file provided' });
         }
 
-        const base64Image = req.file.buffer.toString('base64');
         const newImage = new imageModel({
-            imageData: base64Image,
+            url: req.file.path,
+            public_id: req.file.filename,
             name: req.body.name,
         });
         const savedImage = await newImage.save();
 
         if (req.body.roomId) {
-            const room = await roomModel.findOne({_id : req.body.roomId});
+            const room = await roomModel.findOne({_id: req.body.roomId});
             if (!room) {
                 return res.status(404).json({ error: 'Room not found' });
             }
             const currentIconId = room.icon;
             if (currentIconId) {
-                await imageModel.findByIdAndDelete(currentIconId);
+                const oldImage = await imageModel.findById(currentIconId);
+                if (oldImage) {
+                    await cloudinary.uploader.destroy(oldImage.public_id);
+                    await imageModel.findByIdAndDelete(currentIconId);
+                }
             }
             room.icon = savedImage._id;
             await room.save()
@@ -38,7 +43,11 @@ export const uploadImage = async (req, res) => {
             }
             const currentIconId = user.icon;
             if (currentIconId) {
-                await imageModel.findByIdAndDelete(currentIconId);
+                const oldImage = await imageModel.findById(currentIconId);
+                if (oldImage) {
+                    await cloudinary.uploader.destroy(oldImage.public_id);
+                    await imageModel.findByIdAndDelete(currentIconId);
+                }
             }
             user.icon = savedImage._id;
             await user.save()

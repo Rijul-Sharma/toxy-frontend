@@ -24,10 +24,10 @@ const   Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, 'POST', data)
     let response = await res.json()
-    console.log(response)
+    // console.log(response)
     // const cookieSize = encodeURIComponent(JSON.stringify(response)).length;
     // console.log('Cookie size (bytes):', cookieSize);
     if(res.status===200){
@@ -36,7 +36,7 @@ const   Login = () => {
       setCookie('userInfo', response, { path: '/' })
     }
     else{
-      console.log('else')
+      // console.log('else')
       setError('password', { type: 'manual', message: 'Invalid email or password.' });
     }
   }

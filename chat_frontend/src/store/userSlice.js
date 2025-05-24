@@ -37,7 +37,7 @@ export const UserSlice = createSlice({
             state.rooms = [...state.rooms, action.payload]
         },
         exitRoom: (state, action) => {
-            console.log(action.payload, 'payload received')
+            // console.log(action.payload, 'payload received')
             state.rooms = state.rooms.filter(room => String(room) !== String(action.payload));
             // state.selectedRoom = state.rooms[0];
             if (state.selectedRoom && state.selectedRoom._id === action.payload) {

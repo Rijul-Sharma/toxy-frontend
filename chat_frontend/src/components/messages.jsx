@@ -62,13 +62,13 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
     const roomId = selectedRoom._id;
     let a = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/room/info/?roomId=${roomId}`, 'GET');
     let response = await a.json();
-    console.log(response)
+    // console.log(response)
     setRoom(response)
   }
 
   useEffect(() => {
     setRoom(selectedRoom)
-    console.log(room, 'this is the room');
+    // console.log(room, 'this is the room');
   }, [selectedRoom])
 
   const dropdownOptions = [
@@ -77,7 +77,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   ];
 
   const sendMessage = async (message) => {
-    console.log("Sending message:", message);
+    // console.log("Sending message:", message);
     const senderInfo = {
       _id: user._id,
       name: user.name,
@@ -163,13 +163,13 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   }
 
   const handleEmojiSelect = (emojiObject) => {
-    console.log(emojiObject);
+    // console.log(emojiObject);
     setIpMessage(ipMessage + emojiObject.emoji)
     setShowEmojiPicker(false)
   }
 
   const handleDropdownSelect = (s) => {
-    console.log(s.label);
+    // console.log(s.label);
     if (s.label == 'Room Info') {
       setShowInfoModal(true)
     }
@@ -190,7 +190,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
       newAdminId: selectedUser._id
     })
     const res = await a.json()
-    console.log(res, 'response')
+    // console.log(res, 'response')
     updateRoomData()
     fetchRooms()
     socket.emit('roomUpdate', selectedRoom._id)
@@ -202,10 +202,10 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
       room_id: selectedRoom._id,
       memberId: selectedUser._id
     })
-    console.log(selectedRoom._id, 'sr', selectedUser._id, 'su')
+    // console.log(selectedRoom._id, 'sr', selectedUser._id, 'su')
     socket.emit('userKicked', selectedRoom._id, selectedUser._id)
     const res = await a.json();
-    console.log(res, 'kick response')
+    // console.log(res, 'kick response')
     updateRoomData()
     fetchRooms()
     setShowUserOptsModal(false)
@@ -230,7 +230,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
         name: selectedFile.name,
         roomId: room._id
       });
-      console.log('File uploaded successfully:', result);
+      // console.log('File uploaded successfully:', result);
       setSelectedFile(null);
       updateRoomData()
       fetchRooms()
@@ -242,8 +242,8 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
 
   useEffect(() => {
     socket.on('receiveMessage', (message) => {
-      console.log(message.sender, 'sen')
-      console.log('New message received:', message);
+      // console.log(message.sender, 'sen')
+      // console.log('New message received:', message);
       if (selectedRoom?._id === message.room_id) {
         // let newMessage = { content : message.content, sender : message.sender}
         setMessages((prevMessages) => [...prevMessages, message]);
@@ -256,14 +256,14 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
 
     socket.on('roomUpdate', (roomId) => {
       if (selectedRoom && selectedRoom._id === roomId) {
-        console.log('roomUpdate event received in Messages for room:', roomId);
+        // console.log('roomUpdate event received in Messages for room:', roomId);
         updateRoomData();
       }
       fetchRooms()
     });
 
     socket.on('userKicked', ({ roomId, userId }) => {
-      console.log('userKicked event received for room:', roomId, 'user:', userId);
+      // console.log('userKicked event received for room:', roomId, 'user:', userId);
       if (user._id === userId && roomId === selectedRoom._id) {
         setShowInfoModal(false)
         setShowDropdown(false)
@@ -380,7 +380,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
             <div>
               {room?.icon ? (
                 <img
-                  src={`data:image/jpeg;base64,${room.icon?.imageData}`}
+                  src={room.icon?.url}
                   alt={room.icon?.name}
                   className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover"
                 />
@@ -430,9 +430,9 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                     <div key={groupIndex} className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} ${isCurrentUser ? 'self-end' : 'self-start'} max-w-[70%]`}>
                       {!isCurrentUser && userGroup[0].isFirstInGroup && (
                         <div className={`${isCurrentUser ? 'ml-2' : 'mr-2'} flex items-start mt-2`}>
-                          {senderIcon?.imageData ? (
+                          {senderIcon?.url ? (
                             <img
-                              src={`data:image/jpeg;base64,${senderIcon.imageData}`}
+                              src={senderIcon.url}
                               alt={senderIcon.name || "User"}
                               className="w-9 h-9 rounded-full object-cover"
                             />
@@ -494,9 +494,9 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
           <div className='flex flex-col sm:flex-row justify-around p-3 gap-5 sm:gap-10 overflow-y-auto max-h-[50vh]'>
             <div className='flex flex-col w-full gap-4'>
               <div className='flex flex-col gap-3 items-center'>
-                {room?.icon?.imageData ? (
+                {room?.icon?.url ? (
                   <img
-                    src={`data:image/jpeg;base64,${room.icon.imageData}`}
+                    src={room.icon.url}
                     alt={room.icon?.name}
                     className="h-28 w-28 rounded-full object-cover"
                   />
@@ -562,9 +562,9 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                     {room?.users?.map((e) => (
                       <li key={e._id} className='border-black border-b-[1px] p-2 flex justify-between'>
                         <div className='flex gap-3'>
-                          {e.icon ? (
+                          {e.icon?.url ? (
                             <img
-                              src={`data:image/jpeg;base64,${e.icon.imageData}`}
+                              src={e.icon.url}
                               alt={room.icon?.name}
                               className="w-6 rounded-full object-cover"
                             />

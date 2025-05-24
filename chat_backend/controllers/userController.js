@@ -4,9 +4,9 @@ import mongoose from "mongoose";
 
 export const getUser = async (req,res) => {
     const userId = req.query.userId
-    console.log(userId)
+    // console.log(userId)
     let a = await userModel.findOne({_id : userId})
-    console.log({user : a}, 'This one')
+    // console.log({user : a}, 'This one')
     res.json(a);
 }
 

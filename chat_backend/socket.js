@@ -14,10 +14,10 @@ export const setupSocketEvents = (io) => {
         })
     
         socket.on('sendMessage', async (roomId, content, sender)=> {
-            console.log("sm called")
-            console.log(roomId, 'room')
-            console.log(content, 'this is content')
-            console.log(sender, 'tis is the sender')
+            // console.log("sm called")
+            // console.log(roomId, 'room')
+            // console.log(content, 'this is content')
+            // console.log(sender, 'tis is the sender')
             if(roomId){
                 const now = new Date();
                 const message = {
@@ -26,14 +26,14 @@ export const setupSocketEvents = (io) => {
                     sender : sender,
                     sentAt : now.toISOString()
                 }
-                console.log(message, 'this is message')
-                console.log('Message received : ', content)
+                // console.log(message, 'this is message')
+                // console.log('Message received : ', content)
                 io.to(roomId).emit('receiveMessage', message)
             }
         })
 
         socket.on('joinRoom', (userId, roomIds) => {
-            console.log(userId,roomIds, 'this is it')
+            // console.log(userId,roomIds, 'this is it')
             if (Array.isArray(roomIds) && roomIds.length > 0) {
                 roomIds.forEach((roomId) => {
                     socket.join(roomId);
@@ -50,7 +50,7 @@ export const setupSocketEvents = (io) => {
 
         socket.on('userKicked', (roomId, userId) => {
             if(roomId && userId){
-                console.log(roomId, 'sr', userId, 'su')
+                // console.log(roomId, 'sr', userId, 'su')
                 io.to(roomId).emit('userKicked', {roomId, userId})
             }
         })

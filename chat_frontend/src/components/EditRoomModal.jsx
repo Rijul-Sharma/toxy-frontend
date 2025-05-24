@@ -25,7 +25,7 @@ const EditRoomModal = ({isOpen, onClose, room , updateRoom, fetchRooms}) => {
         // setRoomName('')
         // setRoomDesc('')
         const a = await res.json();
-        console.log(a)
+        // console.log(a)
         updateRoom()
         fetchRooms()
         socket.emit('roomUpdate', room._id)

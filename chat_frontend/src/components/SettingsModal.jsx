@@ -53,7 +53,7 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
         })
 
         let res = await a.json();
-        console.log(res, 'name response')
+        // console.log(res, 'name response')
         setEditName(false)
         dispatch(loginSuccess(res.response))
         setCookie('userInfo', res.response, { path: '/' });
@@ -83,7 +83,7 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
             name: selectedFile.name,
             userId : user._id
           });
-          console.log('File uploaded successfully:', result);
+        //   console.log('File uploaded successfully:', result);
           setSelectedFile(null);
           fetchIcon()
           const updatedCookie = {
@@ -101,7 +101,7 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
     const handleDeleteAccount = async () => {
         const a = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/user/delete?userId=${user._id}`, 'DELETE')
         const res = await a.json();
-        console.log(res);
+        // console.log(res);
         if(a.status === 200){
             navigate('/login')
             dispatch(logout())
@@ -131,7 +131,7 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                                 <div className='flex flex-col gap-3 items-center'>
                                     {user.icon ? (
                                         <img
-                                            src={`data:image/jpeg;base64,${icon?.imageData}`}
+                                            src={icon?.url}
                                             alt={user.icon.name}
                                             className="h-28 w-28 rounded-full"
                                         />

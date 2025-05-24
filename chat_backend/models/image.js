@@ -1,8 +1,11 @@
-import { Schema,model } from "mongoose";
-
+import { Schema, model } from "mongoose";
 
 const imageSchema = Schema({
-    imageData: {
+    url: {
+        type: String,
+        required: true
+    },
+    public_id: {
         type: String,
         required: true
     },
@@ -11,10 +14,11 @@ const imageSchema = Schema({
         required: true
     },
     createdAt: {
-        type: Date, default: Date.now
+        type: Date,
+        default: Date.now
     },
-})
+});
 
-let imageModel = model('image', imageSchema)
+let imageModel = model('image', imageSchema);
 
-export default imageModel
+export default imageModel;

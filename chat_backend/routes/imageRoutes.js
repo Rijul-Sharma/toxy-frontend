@@ -1,12 +1,6 @@
 import express from 'express'
 import { uploadImage } from '../controllers/imageController.js'
-
-import multer from 'multer';
-
-const upload = multer({
-  storage: multer.memoryStorage()
-});
-
+import { upload } from '../config/cloudinary.js'
 
 const router = express.Router()
 

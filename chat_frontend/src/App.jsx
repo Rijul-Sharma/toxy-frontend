@@ -18,13 +18,13 @@ function App() {
   const userInfo = cookie.userInfo;
 
   
-  useEffect(() => {
-    console.log(abc)
-  },)
+  // useEffect(() => {
+  //   console.log(abc)
+  // },)
   
   useEffect(() => {
     if(userInfo){
-      console.log(cookie.userInfo)
+      // console.log(cookie.userInfo)
       dispatch(loginSuccess(cookie.userInfo || {}))
     }
   }, [])

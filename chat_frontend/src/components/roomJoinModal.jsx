@@ -47,7 +47,7 @@ const RoomJoinModal = ({ isOpen, onClose }) => {
       if(res.status === 200){
         const a = await res.json();
         dispatch(updateRooms(a.response._id))
-        console.log(a.response, 'yeh wala hai')
+        // console.log(a.response, 'yeh wala hai')
         socket.emit('roomUpdate', a.response._id)
     
         const updatedCookie = {
