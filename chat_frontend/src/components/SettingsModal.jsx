@@ -149,20 +149,23 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                                         <div className="relative h-28 w-28">
                                             <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
                                             <img
-                                            src={URL.createObjectURL(selectedFile)}
-                                            alt="Preview"
-                                            className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
+                                                src={URL.createObjectURL(selectedFile)}
+                                                alt="Preview"
+                                                className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
                                             />
                                             <span className="absolute top-1 right-1 bg-yellow-300 text-black text-[10px] px-2 py-[2px] rounded-full shadow-sm">
-                                            PREVIEW
+                                                PREVIEW
                                             </span>
                                         </div>
                                     ) : icon?.url ? (
-                                        <img
-                                            src={icon.url}
-                                            alt="User Icon"
-                                            className="h-28 w-28 rounded-full object-cover"
-                                        />
+                                        <div className="relative h-28 w-28">
+                                            <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
+                                            <img
+                                                src={icon.url}
+                                                alt="User Icon"
+                                                className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
+                                            />
+                                        </div>
                                     ) : (
                                         <div className="h-28 w-28 rounded-full bg-gray-400 flex items-center justify-center text-white text-4xl font-bold">
                                             {(() => {

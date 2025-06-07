@@ -521,11 +521,14 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                     </span>
                   </div>
                 ) : room?.icon?.url ? (
-                  <img
-                    src={room.icon.url}
-                    alt={room.icon?.name}
-                    className="h-28 w-28 rounded-full object-cover"
-                  />
+                  <div className="relative h-28 w-28">
+                      <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
+                      <img
+                          src={room.icon.url}
+                          alt={room.icon?.name}
+                          className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
+                      />
+                  </div>
                 ) : (
                   <div className="h-28 w-28 rounded-full bg-gray-400" />
                 )}
