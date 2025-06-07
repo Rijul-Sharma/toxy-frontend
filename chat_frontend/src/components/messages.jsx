@@ -65,11 +65,25 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
     // console.log(response)
     setRoom(response)
   }
+  
 
   useEffect(() => {
     setRoom(selectedRoom)
     // console.log(room, 'this is the room');
   }, [selectedRoom])
+
+  useEffect(() => {
+    let previewUrl;
+    if (selectedFile) {
+      previewUrl = URL.createObjectURL(selectedFile);
+    }
+
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [selectedFile]);
 
   const dropdownOptions = [
     { label: "Room Info", className: "text-gray-700 hover:bg-gray-100 text-lg" },
@@ -361,7 +375,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   if (!selectedRoom) {
     return (
       <div className='flex justify-center items-center h-full p-5'>
-        <div className='text-4xl text-center'>Select a Room and start talking!</div>
+        <div className='text-4xl text-center'>Select a room and start talking!</div>
       </div>
     )
   }
@@ -494,7 +508,19 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
           <div className='flex flex-col sm:flex-row justify-around p-3 gap-5 sm:gap-10 overflow-y-auto max-h-[50vh]'>
             <div className='flex flex-col w-full gap-4'>
               <div className='flex flex-col gap-3 items-center'>
-                {room?.icon?.url ? (
+                {selectedFile ? (
+                  <div className="relative h-28 w-28">
+                    <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
+                    <img
+                      src={URL.createObjectURL(selectedFile)}
+                      alt="Preview"
+                      className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
+                    />
+                    <span className="absolute top-1 right-1 bg-yellow-300 text-black text-[10px] px-2 py-[2px] rounded-full shadow-sm">
+                      PREVIEW
+                    </span>
+                  </div>
+                ) : room?.icon?.url ? (
                   <img
                     src={room.icon.url}
                     alt={room.icon?.name}
@@ -503,6 +529,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                 ) : (
                   <div className="h-28 w-28 rounded-full bg-gray-400" />
                 )}
+
                 <span className='mx-auto text-blue-400 hover:text-blue-700 cursor-pointer' onClick={triggerFileInput}>Change Room Icon</span>
                 {selectedFile && (
                   <div className='flex flex-col gap-1'>

@@ -146,11 +146,17 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                             <div className='flex flex-col items-center gap-4 w-full mx-auto sm:w-full'>
                                 <div className='flex flex-col gap-3 items-center'>
                                     {selectedFile ? (
-                                        <img
+                                        <div className="relative h-28 w-28">
+                                            <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
+                                            <img
                                             src={URL.createObjectURL(selectedFile)}
                                             alt="Preview"
-                                            className="h-28 w-28 rounded-full object-cover"
-                                        />
+                                            className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
+                                            />
+                                            <span className="absolute top-1 right-1 bg-yellow-300 text-black text-[10px] px-2 py-[2px] rounded-full shadow-sm">
+                                            PREVIEW
+                                            </span>
+                                        </div>
                                     ) : icon?.url ? (
                                         <img
                                             src={icon.url}
