@@ -33,13 +33,16 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
     // }
 
     const fetchIcon = async () => {
+        if (!user?._id) return;
         let a = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/user/icon/?userId=${user._id}`, 'GET')
         let response = await a.json();
         setIcon(response)
     }
 
     useEffect(()=>{
-        fetchIcon();
+        if (user && user._id) {
+            fetchIcon();
+        }
     }, [user._id])
 
     const ipNameChange = (e) => {
@@ -109,6 +112,19 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
         }
     }
 
+    useEffect(() => {
+        let previewUrl;
+        if (selectedFile) {
+            previewUrl = URL.createObjectURL(selectedFile);
+        }
+
+        return () => {
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [selectedFile]);
+
 
     if (!isOpen) return null;
     return (
@@ -129,16 +145,29 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                         {selection === '1' && (
                             <div className='flex flex-col items-center gap-4 w-full mx-auto sm:w-full'>
                                 <div className='flex flex-col gap-3 items-center'>
-                                    {user.icon ? (
+                                    {selectedFile ? (
                                         <img
-                                            src={icon?.url}
-                                            alt={user.icon.name}
-                                            className="h-28 w-28 rounded-full"
+                                            src={URL.createObjectURL(selectedFile)}
+                                            alt="Preview"
+                                            className="h-28 w-28 rounded-full object-cover"
+                                        />
+                                    ) : icon?.url ? (
+                                        <img
+                                            src={icon.url}
+                                            alt="User Icon"
+                                            className="h-28 w-28 rounded-full object-cover"
                                         />
                                     ) : (
-                                        <div className="h-28 w-28 rounded-full bg-gray-400" />
-                                    )
-                                    }
+                                        <div className="h-28 w-28 rounded-full bg-gray-400 flex items-center justify-center text-white text-4xl font-bold">
+                                            {(() => {
+                                                if (!user.name) return '?';
+                                                const parts = user.name.trim().split(' ');
+                                                const first = parts[0]?.charAt(0).toUpperCase() || '';
+                                                const second = parts[1]?.charAt(0).toUpperCase() || '';
+                                                return (first + second) || '?';
+                                            })()}
+                                        </div>
+                                    )}
                                     <span className='mx-auto text-blue-400 hover:text-blue-700 cursor-pointer' onClick={triggerFileInput}>Change User Icon</span>
                                     <input
                                         type="file"
