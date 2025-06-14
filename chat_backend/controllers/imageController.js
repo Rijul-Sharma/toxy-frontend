@@ -59,3 +59,47 @@ export const uploadImage = async (req, res) => {
         res.status(500).json({ error: 'Image upload failed', details: err.message });
     }
 }
+
+
+export const deleteImage = async (req, res) => {
+    try {
+        const { userId, roomId } = req.body;
+
+        if (!userId && !roomId) {
+            return res.status(400).json({ error: 'userId or roomId must be provided' });
+        }
+
+        let imageIdToDelete;
+
+        if (userId) {
+            const user = await userModel.findById(userId);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            imageIdToDelete = user.icon;
+            user.icon = null;
+            await user.save();
+        }
+
+        if (roomId) {
+            const room = await roomModel.findById(roomId);
+            if (!room) return res.status(404).json({ error: 'Room not found' });
+
+            imageIdToDelete = room.icon;
+            room.icon = null;
+            await room.save();
+        }
+
+        if (imageIdToDelete) {
+            const image = await imageModel.findById(imageIdToDelete);
+            if (image) {
+                await cloudinary.uploader.destroy(image.public_id);
+                await imageModel.findByIdAndDelete(imageIdToDelete);
+            }
+        }
+
+        res.status(200).json({ message: 'Icon deleted successfully' });
+    } catch (err) {
+        console.error('Delete icon error:', err);
+        res.status(500).json({ error: 'Failed to delete icon', details: err.message });
+    }
+};
