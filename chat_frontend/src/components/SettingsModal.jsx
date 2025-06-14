@@ -112,6 +112,29 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
         }
     }
 
+    const handleDeleteIcon = async () => {
+        try {
+            const res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/image/delete`, 'POST', {
+                userId: user._id
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                setIcon({});
+                const updatedCookie = {
+                    ...cookie.userInfo,
+                    icon: null
+                };
+                setCookie('userInfo', updatedCookie, { path: '/' });
+                dispatch(updateIcon(null));
+            } else {
+                console.error('Failed to delete icon:', json.error || json.message);
+            }
+        } catch (err) {
+            console.error('Error deleting icon:', err);
+        }
+    };
+
     useEffect(() => {
         let previewUrl;
         if (selectedFile) {
@@ -177,7 +200,19 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                                             })()}
                                         </div>
                                     )}
-                                    <span className='mx-auto text-blue-400 hover:text-blue-700 cursor-pointer' onClick={triggerFileInput}>Change User Icon</span>
+                                    {/* <span className='mx-auto text-blue-400 hover:text-blue-700 cursor-pointer' onClick={triggerFileInput}>Change User Icon</span> */}
+                                    
+                                    {!selectedFile && (
+                                        <div>
+                                            <span className='mx-auto text-blue-400 hover:text-blue-700 cursor-pointer' onClick={triggerFileInput}>Change Icon</span>
+                                            {icon?.url && (
+                                                <>
+                                                    <span className='text-gray-500'> | </span>
+                                                    <span className='mx-auto text-red-400 hover:text-red-700 cursor-pointer' onClick={handleDeleteIcon}>Delete Icon</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
                                     <input
                                         type="file"
                                         id="fileInput"
