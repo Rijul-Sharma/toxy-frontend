@@ -10,13 +10,17 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
+  params: (req, file) => ({
     folder: 'toxy-images',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
-    transformation: [{ width: 500, height: 500, crop: 'limit' }]
-  }
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 500, height: 500, crop: 'limit' }],
+    public_id: `${Date.now()}-${file.originalname.split('.')[0]}`
+  })
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage, 
+  limits : { fileSize : 5 * 1024 * 1024 }
+});
 
 export { cloudinary, upload }; 

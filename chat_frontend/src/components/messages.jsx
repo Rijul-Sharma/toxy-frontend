@@ -226,7 +226,16 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   }
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const file = event.target.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Oops! Looks like that file isn\'t supported. Try uploading a JPG, PNG, GIF, or WebP image!');
+            return;
+        }
+
+        setSelectedFile(file);
   };
 
   const triggerFileInput = () => {
