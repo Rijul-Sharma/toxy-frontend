@@ -235,6 +235,12 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
             return;
         }
 
+        const maxSizeInBytes = 5 * 1024 * 1024;
+        if (file.size > maxSizeInBytes) {
+          alert("That file is too large. Please upload an image smaller than 5MB.");
+          return;
+        }
+
         setSelectedFile(file);
   };
 
