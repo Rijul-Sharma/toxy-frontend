@@ -40,4 +40,4 @@ Thumbs.db
 coverage/
 
 # Frontend Build Output (e.g., Vite, React, Next.js, etc.)
-public/
+# public/
