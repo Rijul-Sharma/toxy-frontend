@@ -419,7 +419,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   return (
     <div className='h-full'>
       <div className='flex flex-col h-full justify-between'>
-        <div className='h-[70px] bg-[#2a2a2a] rounded-tr-md px-1 sm:p-3 flex justify-between items-center'>
+        <div className='h-[70px] bg-[#2a2a2a] rounded-tr-md px-1 sm:p-3 flex justify-between items-center sticky'>
           <div className='flex gap-3 items-center'>
             <div className='w-7 sm:hidden hover:bg-gray-600 transition-all duration-300 ease-in-out rounded-full cursor-pointer' onClick={() => {
               setShowRight(false)
@@ -513,7 +513,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
             <div ref={messagesEndRef} />
           </div>
         </div>
-        <div className='h-[70px] bg-[#2a2a2a] flex justify-evenly items-center rounded-br-md text-black gap-4 relative px-2'>
+        <div className='h-[70px] bg-[#2a2a2a] flex justify-evenly items-center rounded-br-md text-black gap-4 sticky px-2'>
           <div className='relative hover:bg-gray-600 transition-all duration-300 ease-in-out rounded-full p-1 cursor-pointer'>
             {!showEmojiPicker ? (
               <img onClick={() => setShowEmojiPicker(!showEmojiPicker)} src={emojiButton} alt="" />
