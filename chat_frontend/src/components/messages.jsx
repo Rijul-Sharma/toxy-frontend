@@ -395,6 +395,27 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
     )
   }
 
+  const linkifyText = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+
+    return parts.map((part, i) => (
+      urlRegex.test(part) ? (
+        <a
+          key={i}
+          href={part}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='text-blue-600 underline break-all hover:text-blue-800'
+        >
+          {part}
+        </a>
+      ) : (
+        <span key={i} className='whitespace-pre-wrap break-words'>{part}</span>
+      )
+    ));
+  }
+
   return (
     <div className='h-full'>
       <div className='flex flex-col h-full justify-between'>
@@ -456,7 +477,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                   const senderIcon = getUserIcon(firstMessage.sender._id);
 
                   return (
-                    <div key={groupIndex} className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} ${isCurrentUser ? 'self-end' : 'self-start'} max-w-[70%]`}>
+                    <div key={groupIndex} className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} ${isCurrentUser ? 'self-end' : 'self-start'} max-w-[85%]`}>
                       {!isCurrentUser && userGroup[0].isFirstInGroup && (
                         <div className={`${isCurrentUser ? 'ml-2' : 'mr-2'} flex items-start mt-2`}>
                           {senderIcon?.url ? (
@@ -470,16 +491,19 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                           )}
                         </div>
                       )}
-                      <div className='flex flex-col'>
-                        {userGroup.map((item, messageIndex) => (
-                          <div key={messageIndex} className={`py-2 px-3 text-black bg-white my-1 rounded-2xl sm:text-lg ${isCurrentUser ? 'self-end' : 'self-start'} min-w-[50px]`}>
-                            {messageIndex === 0 && (
-                              <div className={`text-xs mb-1 ${isCurrentUser && 'text-end'}`}>{item.sender.name}</div>
-                            )}
-                            <div>{item.content}</div>
-                            <div className='text-xs text-end mt-1 text-gray-500'>{format(new Date(item.sentAt), 'hh:mm a')}</div>
-                          </div>
-                        ))}
+
+                      <div className='flex w-full'>
+                        <div className='flex flex-col w-full'>
+                          {userGroup.map((item, messageIndex) => (
+                            <div key={messageIndex} className={`py-2 px-3 text-black bg-white my-1 rounded-2xl sm:text-lg ${isCurrentUser ? 'self-end' : 'self-start'} min-w-[50px] break-words whitespace-pre-wrap max-w-full`}>
+                              {messageIndex === 0 && (
+                                <div className={`text-xs mb-1 ${isCurrentUser && 'text-end'}`}>{item.sender.name}</div>
+                              )}
+                              <div>{linkifyText(item.content)}</div>
+                              <div className='text-xs text-end mt-1 text-gray-500'>{format(new Date(item.sentAt), 'hh:mm a')}</div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   );

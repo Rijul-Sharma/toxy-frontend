@@ -251,24 +251,24 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                                         </div>
                                     )}
                                 </div>
-                                <div className='flex justify-between w-full'>
-                                    <div>Email :</div>
-                                    <div>{user.email}</div>
+                                <div className='flex flex-col sm:flex-row justify-between w-full gap-2 sm:gap-0'>
+                                    <div className='font-medium'>Email :</div>
+                                    <div className='text-gray-700 break-words w-full sm:w-[70%] sm:text-end'>{user.email}</div>
                                 </div>
-                                <div className='flex justify-between w-full'>
-                                    <div>Username :</div>
+                                <div className='flex flex-col sm:flex-row justify-between w-full gap-2 sm:gap-0'>
+                                    <div className='font-medium'>Username :</div>
                                     {editName ? (
-                                        <div className='flex gap-2 transition-all'>
+                                        <div className='flex gap-2 w-full sm:w-[70%] sm:justify-end sm:text-end transition-all'>
                                             <div>
-                                                <input className='pl-1 border-2 border-[#8a3fff] focus:border-[#8a3fff] focus:outline-none' type="text" value={ipName} onChange={ipNameChange} autoFocus/>
+                                                <input className='flex-grow pl-2 border border-[#8a3fff] rounded focus:outline-none' type="text" value={ipName} onChange={ipNameChange} autoFocus/>
                                             </div>
-                                            <div className='hover:bg-slate-200 rounded-full p-[1px] transition-all ease-in-out' onClick={()=>saveName()}>
-                                                <img src={tick} alt="" />
+                                            <div className='hover:bg-slate-200 rounded-full p-[1px] transition-all ease-in-out cursor-pointer' onClick={()=>saveName()}>
+                                                <img src={tick} alt="Save" />
                                             </div>
                                         </div>
 
                                     ) : (
-                                        <div className='flex gap-1'>
+                                        <div className='flex gap-2 items-center text-gray-700 w-full sm:w-[70%] sm:justify-end sm:text-end break-words'>
                                             <div>{user.name}</div>
                                             <div className='cursor-pointer' onClick={()=> setEditName(true)}><img src={edit} alt="" /></div>
                                         </div>
