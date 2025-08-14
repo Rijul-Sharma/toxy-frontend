@@ -501,10 +501,10 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                             <img
                               src={senderIcon.url}
                               alt={senderIcon.name || "User"}
-                              className="w-9 h-9 rounded-full object-cover"
+                              className="w-9 h-9 max-w-none rounded-full object-cover"
                             />
                           ) : (
-                            <img src={usericon} alt="User" className="w-9 h-9 rounded-full bg-gray-300 p-1" />
+                            <img src={usericon} alt="User" className="w-9 h-9 max-w-none rounded-full bg-gray-300 p-1" />
                           )}
                         </div>
                       )}
@@ -652,11 +652,11 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                             <img
                               src={e.icon.url}
                               alt={room.icon?.name}
-                              className="w-6 rounded-full object-cover"
+                              className="w-6 max-w-none rounded-full object-cover"
                             />
                           ) :
                             (
-                              <img className='w-4 ' src={usericon} alt="Room User" />
+                              <img className='w-4 max-w-none' src={usericon} alt="Room User" />
                             )}
 
                           <div>{e.name}</div>
