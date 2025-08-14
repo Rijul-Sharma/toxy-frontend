@@ -652,7 +652,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                             <img
                               src={e.icon.url}
                               alt={room.icon?.name}
-                              className="w-6 max-w-none rounded-full object-cover"
+                              className="w-6 h-6 max-w-none rounded-full object-cover"
                             />
                           ) :
                             (
