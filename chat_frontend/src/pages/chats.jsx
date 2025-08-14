@@ -5,10 +5,11 @@ import messageBackgroundimg from '../assets/SCR-20250218-uaua.png'
 import { useCookies } from 'react-cookie'
 import { useSelector, useDispatch } from 'react-redux'
 import Messages from '../components/messages.jsx'
-import { updateSelectedRoom, updateRooms, logout, exitRoom } from '../store/userSlice.js'
+import { updateSelectedRoom, updateRooms, logout, exitRoom, updateUnreadCounts, clearUnreadCount, setUnreadCount } from '../store/userSlice.js'
 import socket from '../socket.js'
 import Modal from '../components/modal.jsx'
 import _fetch from '../fetch.js'
+import { getUnreadCounts } from '../unreadUtils.js'
 import Dropdown from '../components/Dropdown.jsx'
 import settings from '../assets/settings.svg'
 import threeDots from '../assets/threeDots.svg'
@@ -24,7 +25,7 @@ const Chats = () => {
   const [cookie, setCookie, removeCookie] = useCookies('userinfo')
   // console.log(cookie.userInfo.rooms)
   const user = useSelector((st) => st.user)
-  const {selectedRoom} = useSelector((st) => st.user)
+  const {selectedRoom, unreadCounts} = useSelector((st) => st.user)
   const [rooms, setRooms] = useState([])
   const [showAddRoomModal, setShowAddRoomModal] = useState(false)
   const toggleAddRoomModal = () => setShowAddRoomModal(!showAddRoomModal)
@@ -50,9 +51,26 @@ const Chats = () => {
     setRooms(response)
   }
 
+  const fetchUnreadCounts = async () => {
+    try {
+      const response = await getUnreadCounts(user._id);
+      if (response.unreadCounts) {
+        dispatch(updateUnreadCounts(response.unreadCounts));
+      }
+    } catch (error) {
+      console.error('Error fetching unread counts:', error);
+    }
+  }
+
   useEffect(()=> {
     fetchRooms()
   },[user])
+
+  useEffect(() => {
+    if (user._id && user.rooms.length > 0) {
+      fetchUnreadCounts()
+    }
+  }, [user._id, user.rooms])
 
 
   const dropdownOptions = [
@@ -104,6 +122,20 @@ const Chats = () => {
     socket.on('roomUpdate', (roomId) => {
       // console.log('roomUpdate event received for room:', roomId);
       fetchRooms();
+      // Also refresh unread counts when rooms are updated
+      if (user._id) {
+        fetchUnreadCounts();
+      }
+    });
+
+    socket.on('receiveMessage', (message) => {
+      // Update unread counts when receiving messages for non-selected rooms
+      if (selectedRoom?._id !== message.room_id && message.sender._id !== user._id) {
+        dispatch(setUnreadCount({ 
+          roomId: message.room_id, 
+          count: (unreadCounts[message.room_id] || 0) + 1 
+        }));
+      }
     });
   
     socket.on('userKicked', ({ roomId, userId }) => {
@@ -126,9 +158,10 @@ const Chats = () => {
     });
     return () => {
       socket.off('roomUpdate');
+      socket.off('receiveMessage');
       socket.off('userKicked');
     };
-  }, [user]);
+  }, [user, selectedRoom, unreadCounts]);
 
 
   const handleSearch = (e) => {
@@ -139,6 +172,8 @@ const Chats = () => {
   const handleclick = (item) => {
     // console.log(`Clicked ${item.name}`)
     dispatch(updateSelectedRoom(item))
+    // Clear unread count for selected room
+    dispatch(clearUnreadCount(item._id))
     // setSelectedRoom(item)
     // console.log(item, 'selected room here')
     setShowRight(true)
@@ -208,7 +243,7 @@ const Chats = () => {
 
             {filteredRooms?.map((room) => (
               <div key={room._id} 
-              className={`px-4 sm:px-1 md:px-2 lg:px-4 py-3 border-[2px] border-transparent hover:border-[#8a3fff] transition-all duration-100 ease-in-out cursor-pointer flex gap-4 items-center ${
+              className={`px-4 sm:px-1 md:px-2 lg:px-4 py-3 border-[2px] border-transparent hover:border-[#8a3fff] transition-all duration-100 ease-in-out cursor-pointer flex gap-4 items-center relative ${
                   room._id === selectedRoom?._id ? 'bg-[#312f2f]' : ''
               }`} 
               onClick={() => handleclick(room)}
@@ -227,6 +262,12 @@ const Chats = () => {
                   <span className='md:text-lg'>{room.name}</span>
                   {room.lastMessage && (<div className='text-gray-400 truncate overflow-hidden whitespace-nowrap sm:text-xs md:text-base'><span>{room?.lastMessage?.sender?.name} : </span><span>{room?.lastMessage?.content}</span></div>)}
                 </div>
+                {/* Unread count badge */}
+                {unreadCounts[room._id] > 0 && (
+                  <div className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    {unreadCounts[room._id] > 99 ? '99+' : unreadCounts[room._id]}
+                  </div>
+                )}
               </div>
             ))}
           </div>

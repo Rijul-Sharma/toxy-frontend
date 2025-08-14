@@ -9,7 +9,7 @@ import emojiButton from '../assets/emojiButton.svg'
 import Dropdown from './Dropdown.jsx'
 import threedots from '../assets/threeDots.svg'
 import adduser from '../assets/adduser.svg'
-import { exitRoom, updateSelectedRoom } from '../store/userSlice.js'
+import { exitRoom, updateSelectedRoom, setUnreadCount } from '../store/userSlice.js'
 import { useCookies } from 'react-cookie'
 import Modal from './modal.jsx'
 import usericon from '../assets/usericon.svg'
@@ -19,12 +19,14 @@ import EditRoomModal from './EditRoomModal.jsx'
 import edit from '../assets/edit.svg'
 import back from '../assets/back.svg'
 import close from '../assets/close.svg'
+import { markRoomAsRead } from '../unreadUtils.js'
 
 const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   const [messages, setMessages] = useState([])
   const [ipMessage, setIpMessage] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const user = useSelector(st => st.user)
+  const { unreadCounts } = useSelector(st => st.user)
   const [showDropdown, setShowDropdown] = useState(false)
   const [cookie, setCookie] = useCookies('userInfo')
   const [showInfoModal, setShowInfoModal] = useState(false)
@@ -69,8 +71,13 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
 
   useEffect(() => {
     setRoom(selectedRoom)
+    // Mark room as read when selected
+    if (selectedRoom && user._id) {
+      markRoomAsRead(user._id, selectedRoom._id)
+        .catch(error => console.error('Error marking room as read:', error));
+    }
     // console.log(room, 'this is the room');
-  }, [selectedRoom])
+  }, [selectedRoom, user._id])
 
   useEffect(() => {
     let previewUrl;
@@ -276,11 +283,21 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
       if (selectedRoom?._id === message.room_id) {
         // let newMessage = { content : message.content, sender : message.sender}
         setMessages((prevMessages) => [...prevMessages, message]);
+        // Mark room as read again since user is actively viewing it
+        if (user._id && message.sender._id !== user._id) {
+          markRoomAsRead(user._id, selectedRoom._id)
+            .catch(error => console.error('Error marking room as read:', error));
+        }
         // console.log(messages)
+      } else {
+        // Update unread count for other rooms
+        dispatch(setUnreadCount({ 
+          roomId: message.room_id, 
+          count: (unreadCounts[message.room_id] || 0) + 1 
+        }));
       }
-      setTimeout(() => {
-        fetchRooms();
-      }, 500);
+      // Update last message display
+      fetchRooms();
     });
 
     socket.on('roomUpdate', (roomId) => {
@@ -309,7 +326,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
       socket.off('roomUpdate')
       socket.off('userKicked')
     };
-  }, [selectedRoom])
+  }, [selectedRoom, user._id, unreadCounts, dispatch])
 
   // useEffect(() => {
   //   setMessages([]);

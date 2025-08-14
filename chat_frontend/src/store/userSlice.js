@@ -6,7 +6,8 @@ const initialState = {
         name : '',
         rooms : [],
         selectedRoom : null,
-        icon : ''
+        icon : '',
+        unreadCounts : {}
 }
 
 export const UserSlice = createSlice({
@@ -26,6 +27,7 @@ export const UserSlice = createSlice({
             state.name = ''
             state.rooms = ''
             state.icon = ''
+            state.unreadCounts = {}
         },
         updateIcon : (state,action) => {
             state.icon = action.payload
@@ -44,10 +46,23 @@ export const UserSlice = createSlice({
                 // state.selectedRoom = state.rooms.length > 0 ? state.rooms[0] : null;
                 state.selectedRoom = null;
             }
+            // Remove unread count for exited room
+            delete state.unreadCounts[action.payload];
+        },
+        updateUnreadCounts: (state, action) => {
+            state.unreadCounts = { ...state.unreadCounts, ...action.payload };
+        },
+        setUnreadCount: (state, action) => {
+            const { roomId, count } = action.payload;
+            state.unreadCounts[roomId] = count;
+        },
+        clearUnreadCount: (state, action) => {
+            const roomId = action.payload;
+            state.unreadCounts[roomId] = 0;
         }
     }
 })  
 
-export const {loginSuccess, logout, updateIcon, updateSelectedRoom, updateRooms, exitRoom} = UserSlice.actions
+export const {loginSuccess, logout, updateIcon, updateSelectedRoom, updateRooms, exitRoom, updateUnreadCounts, setUnreadCount, clearUnreadCount} = UserSlice.actions
 
 export default UserSlice.reducer
