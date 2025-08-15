@@ -9,6 +9,7 @@ import { loginSuccess, updateIcon, logout } from '../store/userSlice.js';
 import { useCookies } from 'react-cookie';
 import trash from '../assets/trash.svg'
 import { useNavigate } from 'react-router-dom';
+import { PreviewableImage } from './ImagePreviewProvider.jsx';
 
 const SettingsModal = ({ isOpen, onClose, user }) => {
 
@@ -198,9 +199,10 @@ const SettingsModal = ({ isOpen, onClose, user }) => {
                                     ) : icon?.url ? (
                                         <div className="relative h-28 w-28">
                                             <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
-                                            <img
+                                            <PreviewableImage
                                                 src={icon.url}
-                                                alt="User Icon"
+                                                alt={user.name + ' icon'}
+                                                title={user.name}
                                                 className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
                                             />
                                         </div>
