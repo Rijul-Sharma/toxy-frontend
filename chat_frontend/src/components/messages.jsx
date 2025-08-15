@@ -20,6 +20,7 @@ import edit from '../assets/edit.svg'
 import back from '../assets/back.svg'
 import close from '../assets/close.svg'
 import { markRoomAsRead } from '../unreadUtils.js'
+import { PreviewableImage } from './ImagePreviewProvider.jsx'
 
 const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   const [messages, setMessages] = useState([])
@@ -446,15 +447,15 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
             </div>
             <div>
               {room?.icon ? (
-                <img
+                <PreviewableImage
                   src={room.icon?.url}
-                  alt={room.icon?.name}
+                  alt={room.icon?.name || room?.name || 'Room icon'}
+                  title={room?.name}
                   className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover"
                 />
               ) : (
                 <div className="h-9 w-9 sm:h-12 sm:w-12 rounded-full bg-gray-400" />
-              )
-              }
+              )}
             </div>
             <div className='text-2xl sm:text-3xl'>{room?.name}</div>
           </div>
@@ -498,9 +499,10 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                       {!isCurrentUser && userGroup[0].isFirstInGroup && (
                         <div className={`${isCurrentUser ? 'ml-2' : 'mr-2'} flex items-start mt-2`}>
                           {senderIcon?.url ? (
-                            <img
+                            <PreviewableImage
                               src={senderIcon.url}
-                              alt={senderIcon.name || "User"}
+                              alt={senderIcon.name || firstMessage.sender.name || 'User'}
+                              title={firstMessage.sender.name}
                               className="w-9 h-9 max-w-none rounded-full object-cover"
                             />
                           ) : (
@@ -576,15 +578,16 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                       PREVIEW
                     </span>
                   </div>
-                ) : room?.icon?.url ? (
-                  <div className="relative h-28 w-28">
-                      <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
-                      <img
-                          src={room.icon.url}
-                          alt={room.icon?.name}
-                          className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
-                      />
-                  </div>
+        ) : room?.icon?.url ? (
+          <div className="relative h-28 w-28">
+            <div className="absolute inset-0 rounded-full bg-blue-400 opacity-40 blur-sm"></div>
+            <PreviewableImage
+              src={room.icon.url}
+              alt={room.icon?.name || room?.name || 'Room icon'}
+              title={room?.name}
+              className="relative h-full w-full rounded-full object-cover border-2 border-white shadow-xl"
+            />
+          </div>
                 ) : (
                   <div className="h-28 w-28 rounded-full bg-gray-400" />
                 )}
@@ -647,29 +650,30 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                   <ul className='bg-gray-200 rounded-md overflow-y-auto'>
                     {room?.users?.map((e) => (
                       <li key={e._id} className='border-black border-b-[1px] p-2 flex justify-between'>
-                        <div className='flex gap-3'>
+                        <div className='flex gap-3 items-center'>
                           {e.icon?.url ? (
-                            <img
+                            <PreviewableImage
                               src={e.icon.url}
-                              alt={room.icon?.name}
+                              alt={e.name + ' avatar'}
+                              title={e.name}
                               className="w-6 h-6 max-w-none rounded-full object-cover"
                             />
-                          ) :
-                            (
-                              <img className='w-4 max-w-none' src={usericon} alt="Room User" />
-                            )}
-
+                          ) : (
+                            <img className='w-6 h-6 max-w-none rounded-full bg-gray-300 object-cover p-[2px]' src={usericon} alt={e.name + ' avatar'} />
+                          )}
                           <div>{e.name}</div>
                         </div>
                         {room?.admin?._id === user._id && e._id !== user._id && (
-                          <div className='text-xs flex items-center bg-slate-300 p-1 rounded-md cursor-pointer hover:bg-slate-400 border-black border-[1px]' onClick={() => {
-                            toggleUserOptsModal()
-                            setSelectedUser(e)
-                          }}>
+                          <div
+                            className='text-xs flex items-center bg-slate-300 p-1 rounded-md cursor-pointer hover:bg-slate-400 border-black border-[1px]'
+                            onClick={() => {
+                              toggleUserOptsModal();
+                              setSelectedUser(e);
+                            }}
+                          >
                             MANAGE
                           </div>
                         )}
-
                       </li>
                     ))}
                   </ul>
