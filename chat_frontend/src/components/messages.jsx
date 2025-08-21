@@ -146,8 +146,8 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
           body: formData,
         });
         const result = await response.json();
-        if (response.ok && result.messageObj && result.messageObj.media) {
-          socket.emit('sendMessage', selectedRoom?._id, message, senderInfo, result.messageObj.media);
+        if (response.ok && result.media) {
+          socket.emit('sendMessage', selectedRoom?._id, message, senderInfo, [result.media]);
         }
       } catch (error) {
         alert('Failed to send media message.');
