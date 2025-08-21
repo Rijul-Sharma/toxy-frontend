@@ -136,6 +136,12 @@ const Chats = () => {
           count: (unreadCounts[message.room_id] || 0) + 1 
         }));
       }
+      // Update lastMessage for the relevant room in the chat list immediately
+      setRooms(prevRooms => prevRooms.map(room =>
+        room._id === message.room_id
+          ? { ...room, lastMessage: message }
+          : room
+      ));
     });
   
     socket.on('userKicked', ({ roomId, userId }) => {

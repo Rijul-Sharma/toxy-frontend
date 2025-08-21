@@ -21,8 +21,36 @@ import back from '../assets/back.svg'
 import close from '../assets/close.svg'
 import { markRoomAsRead } from '../unreadUtils.js'
 import { PreviewableImage } from './ImagePreviewProvider.jsx'
+import addImage from '../assets/addImage.svg'
 
 const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
+  // Chat media upload states
+  const [chatMediaFile, setChatMediaFile] = useState(null); // file selected for preview
+  const [showMediaPreviewModal, setShowMediaPreviewModal] = useState(false);
+  const [confirmedMediaFile, setConfirmedMediaFile] = useState(null); // file confirmed to send
+
+  // Chat message media file change
+  const handleChatMediaFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('File type not supported. Try uploading a JPG, PNG, GIF, WebP image or MP4/WebM video!');
+      return;
+    }
+    const maxSizeInBytes = 10 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      alert("File too large. Please upload a file smaller than 10MB.");
+      return;
+    }
+    setChatMediaFile(file);
+    setShowMediaPreviewModal(true);
+  };
+
+  // Chat media file input trigger
+  const triggerChatMediaFileInput = () => {
+    document.getElementById('chatMediaFileInput').click();
+  };
   const [messages, setMessages] = useState([])
   const [ipMessage, setIpMessage] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -98,26 +126,52 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
     { label: "Exit Room", className: "hover:bg-red-500 hover:text-white text-red-600 text-lg" }
   ];
 
-  const sendMessage = async (message) => {
-    // console.log("Sending message:", message);
+  // Send message with optional media
+  const sendMessage = async (message, mediaFile = null) => {
     const senderInfo = {
       _id: user._id,
       name: user.name,
       icon: user?.icon
     }
-    socket.emit('sendMessage', selectedRoom?._id, message, senderInfo)
-    let a = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/message/save`, 'POST', {
-      content: message,
-      room_id: selectedRoom?._id,
-      sender: user._id,
-    })
-    fetchRooms()
+    if (mediaFile) {
+      try {
+        const formData = new FormData();
+        formData.append('image', mediaFile);
+        formData.append('name', mediaFile.name);
+        formData.append('roomId', selectedRoom?._id);
+        formData.append('sender', user._id);
+        formData.append('content', message);
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/image/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        if (response.ok && result.messageObj && result.messageObj.media) {
+          socket.emit('sendMessage', selectedRoom?._id, message, senderInfo, result.messageObj.media);
+        }
+      } catch (error) {
+        alert('Failed to send media message.');
+      }
+    } else {
+      socket.emit('sendMessage', selectedRoom?._id, message, senderInfo);
+    }
+    // No need to call fetchRooms here, socket will update
   }
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && ipMessage !== '') {
-      sendMessage(ipMessage);
-      setIpMessage('')
+    if (e.key === 'Enter' && (ipMessage !== '' || confirmedMediaFile)) {
+      handleSend();
+    }
+  };
+
+  // Send button handler
+  const handleSend = async () => {
+    let message = ipMessage;
+    setIpMessage('');
+    let mediaFile = confirmedMediaFile;
+    setConfirmedMediaFile(null);
+    if (message !== '' || mediaFile) {
+      await sendMessage(message, mediaFile);
     }
   };
 
@@ -518,6 +572,18 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                               {messageIndex === 0 && (
                                 <div className={`text-xs mb-1 ${isCurrentUser && 'text-end'}`}>{item.sender.name}</div>
                               )}
+                              {/* Show media above text if present */}
+                              {item.media && item.media.length > 0 && (
+                                <div className='mb-2'>
+                                  {item.media.map((mediaObj, idx) => (
+                                    mediaObj.type === 'image' ? (
+                                      <PreviewableImage key={idx} src={mediaObj.url} alt='chat-media' className='max-h-60 rounded-lg mb-2' />
+                                    ) : (
+                                      <video key={idx} src={mediaObj.url} controls className='max-h-60 rounded-lg mb-2' />
+                                    )
+                                  ))}
+                                </div>
+                              )}
                               <div>{linkifyText(item.content)}</div>
                               <div className='text-xs text-end mt-1 text-gray-500'>{format(new Date(item.sentAt), 'hh:mm a')}</div>
                             </div>
@@ -535,7 +601,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
         <div className='h-[70px] bg-[#2a2a2a] flex justify-evenly items-center rounded-br-md text-black gap-4 sticky px-2'>
           <div className='relative hover:bg-gray-600 transition-all duration-300 ease-in-out rounded-full p-1 cursor-pointer'>
             {!showEmojiPicker ? (
-              <img onClick={() => setShowEmojiPicker(!showEmojiPicker)} src={emojiButton} alt="" />
+              <img className='h-9' onClick={() => setShowEmojiPicker(!showEmojiPicker)} src={emojiButton} alt="" />
             )
             :
             (
@@ -543,17 +609,45 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
             )
             }
             <div className='absolute bottom-[40px] left-[0px]'><EmojiPicker open={showEmojiPicker} onEmojiClick={handleEmojiSelect} style={{ width: '300px' }}/></div>
-
           </div>
+          {/* Chat media upload button */}
+          <div className='relative hover:bg-gray-600 transition-all duration-300 ease-in-out rounded-full p-1 cursor-pointer' onClick={triggerChatMediaFileInput}>
+            <span className='text-lg'>
+              <img className='h-9' src={addImage} alt="" />
+            </span>
+            <input type='file' id='chatMediaFileInput' style={{ display: 'none' }} accept='image/*,video/*' onChange={handleChatMediaFileChange} />
+          </div>
+          {/* Show confirmed media preview near send button */}
+          {confirmedMediaFile && (
+            <div className='relative flex items-center'>
+              {confirmedMediaFile.type.startsWith('image') ? (
+                <img src={URL.createObjectURL(confirmedMediaFile)} alt='preview' className='h-12 w-12 rounded-lg object-cover mr-2' />
+              ) : (
+                <video src={URL.createObjectURL(confirmedMediaFile)} controls className='h-12 w-12 rounded-lg object-cover mr-2' />
+              )}
+              <span className='absolute top-0 right-0 bg-red-500 text-white rounded-full px-1 cursor-pointer text-xs' onClick={() => setConfirmedMediaFile(null)}>✕</span>
+            </div>
+          )}
           <input value={ipMessage} onChange={(e) => { setIpMessage(e.target.value) }} onKeyPress={handleKeyPress} type="text" placeholder='Enter Message'
             className='w-[80%] h-11 p-2 rounded-full pl-4 text-lg' />
-          <div className='text-white text-lg bg-[#8a3fff] px-3 py-2 rounded-full cursor-pointer font-oswald' onClick={() => {
-            if(ipMessage !== ''){
-              sendMessage(ipMessage);
-            }
-            setIpMessage('')
-          }}>Send</div>
+          <div className='text-white text-lg bg-[#8a3fff] px-3 py-2 rounded-full cursor-pointer font-oswald' onClick={handleSend}>Send</div>
         </div>
+      {/* Chat media preview modal */}
+      <Modal isOpen={showMediaPreviewModal} onClose={() => { setShowMediaPreviewModal(false); setChatMediaFile(null); }} width='w-[350px]'>
+        <div className='flex flex-col items-center gap-4 p-4'>
+          {chatMediaFile && (
+            chatMediaFile.type.startsWith('image') ? (
+              <img src={URL.createObjectURL(chatMediaFile)} alt='preview' className='h-40 w-40 object-cover rounded-lg' />
+            ) : (
+              <video src={URL.createObjectURL(chatMediaFile)} controls className='h-40 w-40 object-cover rounded-lg' />
+            )
+          )}
+          <div className='flex gap-4 mt-2'>
+            <button className='bg-gray-400 text-white px-4 py-2 rounded' onClick={() => { setShowMediaPreviewModal(false); setChatMediaFile(null); }}>Cancel</button>
+            <button className='bg-blue-500 text-white px-4 py-2 rounded' onClick={() => { setConfirmedMediaFile(chatMediaFile); setShowMediaPreviewModal(false); }}>Add</button>
+          </div>
+        </div>
+      </Modal>
       </div>
 
       <Modal isOpen={showInfoModal} onClose={toggleInfoModal} width='w-[85vw] sm:w-[600px]'>
