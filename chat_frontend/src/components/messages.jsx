@@ -72,6 +72,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   const [showEditRoomModal, setShowEditRoomModal] = useState(false)
   const toggleEditRoomModal = () => setShowEditRoomModal(!showEditRoomModal)
   const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
   const maxLength = 100;
   const toggleReadMore = () => setExpanded(!expanded);
 
@@ -229,13 +230,22 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
 
 
   const getMessages = async () => {
-    if (selectedRoom?._id) {
-      let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/message/?room_id=${selectedRoom._id}`, 'GET')
-      let data = await res.json()
-      let msgs = data.response;
-      // console.log(msgs)
-      setMessages(msgs)
+
+    try {
+      setLoading(true);
+      if (selectedRoom?._id) {
+        let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/message/?room_id=${selectedRoom._id}`, 'GET')
+        let data = await res.json()
+        let msgs = data.response;
+        // console.log(msgs)
+        setMessages(msgs)
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoading(false);
     }
+    
   }
 
   const handleEmojiSelect = (emojiObject) => {
@@ -535,14 +545,19 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
         </div>
 
         <div className='px-3 sm:px-5 my-2 h-[calc(100%-200px)] overflow-y-auto flex-col-reverse'>
-          <div className='flex flex-col'>
-            {groupedMessages?.map(([date, msgs]) => (
-              <div key={date} className='flex flex-col items-center'>
-                <div className='bg-gray-500 my-4 py-1 px-3 rounded-full' style={{ width: 'fit-content' }}>
-                  <div className='text-center text-white'>{formatDate(date)}</div>
-                </div>
-                {/* Group messages by user and 5 minute window */}
-                {groupByUser(msgs)?.map((userGroup, groupIndex) => {
+          <div className='flex flex-col min-h-full'>
+            {loading ? (
+              <div className='flex flex-1 justify-center items-center min-h-full'>
+                <div className="w-12 h-12 border-4 border-gray-300 border-t-[#8a3fff] rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              groupedMessages?.map(([date, msgs]) => (
+                <div key={date} className='flex flex-col items-center'>
+                  <div className='bg-gray-500 my-4 py-1 px-3 rounded-full' style={{ width: 'fit-content' }}>
+                    <div className='text-center text-white'>{formatDate(date)}</div>
+                  </div>
+                  {/* Group messages by user and 5 minute window */}
+                  {groupByUser(msgs)?.map((userGroup, groupIndex) => {
                   // All messages in a group come from the same user
                   const firstMessage = userGroup[0];
                   const isCurrentUser = firstMessage.sender._id === user._id;
@@ -594,7 +609,7 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
                   );
                 })}
               </div>
-            ))}
+            )))}
             <div ref={messagesEndRef} />
           </div>
         </div>
