@@ -27,6 +27,7 @@ export const UserSlice = createSlice({
             state.name = ''
             state.rooms = ''
             state.icon = ''
+            state.selectedRoom = null
             state.unreadCounts = {}
         },
         updateIcon : (state,action) => {

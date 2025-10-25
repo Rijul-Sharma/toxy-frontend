@@ -398,7 +398,11 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
   // }, []);
 
   useEffect(() => {
-    getMessages()
+    if (selectedRoom) {
+      getMessages()
+    } else {
+      setMessages([])
+    }
   }, [selectedRoom])
 
   // Group messages by date
