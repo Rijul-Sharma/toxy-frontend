@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../store/userSlice.js'
 import { useCookies } from 'react-cookie'
 
-const LoginNew = () => {
+const SignupNew = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
@@ -31,7 +31,14 @@ const LoginNew = () => {
   const onSubmit = async (data) => {
     try {
       clearErrors();
-      let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, 'POST', data)
+      
+      const submitData = {
+        email: data.email,
+        name: data.username,
+        password: data.password
+      };
+
+      let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, 'POST', submitData)
       let response = await res.json()
       
       if(res.status === 200){
@@ -39,8 +46,8 @@ const LoginNew = () => {
         dispatch(loginSuccess(response))
         setCookie('userInfo', response, { path: '/' })
       }
-      else if(res.status === 401) {
-        setError('root', { type: 'manual', message: 'Invalid email or password.' });
+      else if(res.status === 409) {
+        setError('email', { type: 'manual', message: 'Email already exists. Please use a different email.' });
       }
       else if(res.status === 400) {
         setError('root', { type: 'manual', message: 'Please check your input and try again.' });
@@ -49,7 +56,7 @@ const LoginNew = () => {
         setError('root', { type: 'manual', message: 'Something went wrong. Please try again later.' });
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Signup error:', error);
       setError('root', { type: 'manual', message: 'Network error. Please check your connection and try again.' });
     }
   }
@@ -76,8 +83,8 @@ const LoginNew = () => {
                     
                     <div className='max-w-[615px] flex flex-col gap-8 md:gap-6 lg:gap-6 [@media(max-aspect-ratio:4/5)]:gap-5 bg-gradient-to-br from-gray-900/40 to-gray-800/20 backdrop-blur-sm border border-gray-600/60 shadow-2xl rounded-2xl justify-center items-center w-[90%] sm:w-[85%] md:w-[85%] lg:w-[85%] xl:w-[80%] [@media(max-aspect-ratio:4/5)]:w-[90%] px-5 md:px-6 lg:px-6 xl:px-5 py-6 sm:py-8 md:py-6 lg:py-6 xl:py-8 [@media(max-aspect-ratio:4/5)]:py-5 h-auto max-h-[85vh] md:h-[80%] lg:h-[80%] xl:h-[75%] [@media(max-aspect-ratio:4/5)]:max-h-[80vh] [@media(max-aspect-ratio:4/5)]:h-auto'>
                         <div className='flex flex-col gap-2 w-full'>
-                            <div className='text-base sm:text-lg md:text-sm lg:text-sm xl:text-lg [@media(max-aspect-ratio:4/5)]:text-xs font-sans'>Welcome Back! We missed you...</div>
-                            <div className='text-4xl sm:text-5xl md:text-4xl lg:text-4xl xl:text-6xl [@media(max-aspect-ratio:4/5)]:text-3xl font-oswald font-semibold'>Login</div>
+                            <div className='text-base sm:text-lg md:text-sm lg:text-sm xl:text-lg [@media(max-aspect-ratio:4/5)]:text-sm font-sans'>Hey there! Let's get started...</div>
+                            <div className='text-4xl sm:text-5xl md:text-4xl lg:text-4xl xl:text-6xl [@media(max-aspect-ratio:4/5)]:text-3xl font-oswald font-semibold'>Sign Up</div>
                         </div>
                         <div className='w-full'>
                             <form className='flex flex-col gap-5 sm:gap-6 md:gap-5 lg:gap-5 xl:gap-8 [@media(max-aspect-ratio:4/5)]:gap-4' onSubmit={handleSubmit(onSubmit)}>
@@ -86,6 +93,20 @@ const LoginNew = () => {
                                         {errors.root.message}
                                     </div>
                                 )}
+                                <div className="username">
+                                    <div className='mb-1 text-base sm:text-lg md:text-sm lg:text-sm xl:text-lg [@media(max-aspect-ratio:4/5)]:text-xs [@media(max-aspect-ratio:4/5)]:mb-1'>Enter username :</div>
+                                    <input 
+                                        className='w-full bg-transparent border-b-[1px] border-white text-white placeholder-gray-400 focus:outline-none focus:border-gray-400 p-2' 
+                                        type="text" 
+                                        placeholder='Username' 
+                                        {...register("username", {
+                                            required: { value: true, message: "Username is required" },
+                                            minLength: { value: 2, message: "Username must be at least 2 characters" },
+                                            maxLength: { value: 30, message: "Username must be less than 30 characters" }
+                                        })}
+                                    />
+                                    {errors.username && <div className='text-red-400 text-xs mt-1'>{errors.username.message}</div>}
+                                </div>
                                 <div className="email">
                                     <div className='mb-1 text-base sm:text-lg md:text-sm lg:text-sm xl:text-lg [@media(max-aspect-ratio:4/5)]:text-xs [@media(max-aspect-ratio:4/5)]:mb-1'>Enter email :</div>
                                     <input 
@@ -110,7 +131,12 @@ const LoginNew = () => {
                                             type={showPassword ? "text" : "password"} 
                                             placeholder='Password' 
                                             {...register("password", {
-                                                required: { value: true, message: "Password is required" }
+                                                required: { value: true, message: "Password is required" },
+                                                minLength: { value: 6, message: "Password must be at least 6 characters" },
+                                                pattern: {
+                                                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                                                    message: "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+                                                }
                                             })}
                                         />
                                         <div
@@ -128,9 +154,9 @@ const LoginNew = () => {
                                         type="submit"
                                         disabled={isSubmitting}
                                     >
-                                        {isSubmitting ? 'Logging in...' : 'Login'}
+                                        {isSubmitting ? 'Creating Account...' : 'Sign Up'}
                                     </button>
-                                    <div className='text-center text-sm sm:text-base md:text-xs lg:text-xs xl:text-base [@media(max-aspect-ratio:4/5)]:text-xs'>Don't have an account? <Link to="/signup" className='text-[#8a3fff] hover:text-[#6a2fff] cursor-pointer'>Sign Up</Link> now!</div>
+                                    <div className='text-center text-sm sm:text-base md:text-xs lg:text-xs xl:text-base [@media(max-aspect-ratio:4/5)]:text-xs'>Already have an account? <Link to="/login" className='text-[#8a3fff] hover:text-[#6a2fff] cursor-pointer'>Login</Link> now!</div>
                                 </div>
                             </form>
                         </div>
@@ -142,4 +168,4 @@ const LoginNew = () => {
   )
 }
 
-export default LoginNew
+export default SignupNew

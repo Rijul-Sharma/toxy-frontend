@@ -198,7 +198,7 @@ const Chats = () => {
 
   return (
     <div className="bg-cover bg-center h-screen flex justify-center items-center" style={{ backgroundImage: `url(${backgroundimg})` }}>
-      <div className='h-full w-full sm:h-[95vh] sm:w-[95vw] bg-[#1d1d1d] text-white flex justify-evenly items-center rounded-md'>
+      <div className='h-full w-full bg-[#1d1d1d] text-white flex justify-evenly items-center rounded-md'>
         <div className={`left w-full sm:w-[25%] h-full border-r-gray-500 sm:border-r-[1px] rounded-tl-md flex flex-col ${showRight && 'hidden sm:flex'}`}>
           <div className='min-h-[70px] bg-black rounded-tl-md flex items-center justify-between py-3 px-3 sm:px-1 md:px-2 xl:pl-7'>
             {/* {name} */}

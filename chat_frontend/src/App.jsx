@@ -3,6 +3,8 @@ import React from 'react'
 import './App.css'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/Login.jsx'
+import LoginNew from './pages/LoginNew.jsx'
+import SignupNew from './pages/SignupNew.jsx'
 import Chats from './pages/chats.jsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { useCookies } from 'react-cookie'
@@ -34,8 +36,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/' element= {userInfo ? <Navigate to="/chats" /> : <Navigate to="/login" />}/>
-        <Route path='/login' element={userInfo ? <Navigate to="/chats" /> : <Login />}/>
-        <Route path='/signup' element={userInfo ? <Navigate to="/chats" /> : <Signup/>}/>
+        <Route path='/login' element={userInfo ? <Navigate to="/chats" /> : <LoginNew />}/>
+        <Route path='/signup' element={userInfo ? <Navigate to="/chats" /> : <SignupNew />}/>
         <Route path='/chats' element= {userInfo ? <Chats/> : <Navigate to="/login" />}/>
       </Routes>
     </BrowserRouter>
