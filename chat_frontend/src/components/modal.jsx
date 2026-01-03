@@ -3,12 +3,24 @@ import './modal.css'
 
 const Modal = ({isOpen, onClose, children, width = 'w-[400px]', padding = '10px', customStyles = {}}) => {
     const [isVisible, setIsVisible] = useState(isOpen)
+    const timeoutRef = React.useRef(null)
 
     useEffect(() => {
       if(isOpen){
+        // Clear any pending timeout when opening
+        if(timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
         setIsVisible(true)
       } else {
-        setTimeout(() => setIsVisible(false), 300);
+        // Set timeout for closing animation
+        timeoutRef.current = setTimeout(() => setIsVisible(false), 300);
+      }
+      
+      return () => {
+        if(timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
       }
     }, [isOpen])
     

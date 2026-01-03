@@ -194,6 +194,14 @@ const Chats = () => {
 
   const filteredRooms = rooms?.filter(room => {
     return room.name.toLowerCase().includes(roomSearchQuery.toLowerCase())
+  }).sort((a, b) => {
+    // Rooms without messages go to the bottom
+    if (!a.lastMessage && !b.lastMessage) return 0;
+    if (!a.lastMessage) return 1;
+    if (!b.lastMessage) return -1;
+    
+    // Sort by most recent message first (descending order)
+    return new Date(b.lastMessage.sentAt) - new Date(a.lastMessage.sentAt);
   })
 
   return (

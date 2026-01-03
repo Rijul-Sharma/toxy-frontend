@@ -129,6 +129,8 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
 
   // Send message with optional media
   const sendMessage = async (message, mediaFile = null) => {
+    const emptyMessageRegex = /^\s*$/;
+    if(emptyMessageRegex.test(message) && !mediaFile) return;
     const senderInfo = {
       _id: user._id,
       name: user.name,
@@ -513,19 +515,16 @@ const Messages = ({ selectedRoom, resetRoom, fetchRooms, setShowRight }) => {
             }}>
               <img src={back} alt="" />
             </div>
-            <div>
-              {room?.icon ? (
-                <PreviewableImage
-                  src={room.icon?.url}
-                  alt={room.icon?.name || room?.name || 'Room icon'}
-                  title={room?.name}
-                  className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover"
-                />
-              ) : (
-                <div className="h-9 w-9 sm:h-12 sm:w-12 rounded-full bg-gray-400" />
-              )}
+            <div className='flex gap-3 items-center cursor-pointer' onClick={() => {setShowInfoModal(true)}}>
+              <div>
+                {room?.icon ? (
+                  <img src={room.icon?.url} alt={room.icon?.name || room?.name || 'Room icon'} className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover"/>
+                ) : (
+                  <div className="h-9 w-9 sm:h-12 sm:w-12 rounded-full bg-gray-400" />
+                )}
+              </div>
+              <div className='text-2xl sm:text-3xl'>{room?.name}</div>
             </div>
-            <div className='text-2xl sm:text-3xl'>{room?.name}</div>
           </div>
           <div className='flex gap-1 sm:gap-5 items-center'>
             <div className='hover:bg-gray-600 transition-all duration-300 ease-in-out rounded-full p-1 cursor-pointer' onClick={() => setShowInviteModal(!showInviteModal)}>
