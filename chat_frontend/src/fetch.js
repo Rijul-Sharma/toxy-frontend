@@ -9,7 +9,8 @@ const fetchData = async (url, method = 'GET', data = null) => {
       const response = await fetch(url, {
           method,
           headers,
-          body
+          body,
+          credentials: 'include'
       });
 
     //   if (!response.ok) {
