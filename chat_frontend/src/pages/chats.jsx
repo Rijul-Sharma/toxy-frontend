@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useEffect } from 'react'
 import backgroundimg from '../assets/pexels-instawally-176851.jpg'
 import messageBackgroundimg from '../assets/SCR-20250218-uaua.png'
-import { useCookies } from 'react-cookie'
 import { useSelector, useDispatch } from 'react-redux'
 import Messages from '../components/messages.jsx'
 import { updateSelectedRoom, updateRooms, logout, exitRoom, updateUnreadCounts, clearUnreadCount, setUnreadCount } from '../store/userSlice.js'
@@ -18,12 +17,11 @@ import SettingsModal from '../components/SettingsModal.jsx'
 import { useNavigate } from 'react-router-dom'
 import RoomJoinModal from '../components/roomJoinModal.jsx'
 import search from '../assets/search.svg'
+import authService from '../services/authService.js'
 
 
 const Chats = () => {
 
-  const [cookie, setCookie, removeCookie] = useCookies('userinfo')
-  // console.log(cookie.userInfo.rooms)
   const user = useSelector((st) => st.user)
   const {selectedRoom, unreadCounts} = useSelector((st) => st.user)
   const [rooms, setRooms] = useState([])
@@ -64,7 +62,7 @@ const Chats = () => {
 
   useEffect(()=> {
     fetchRooms()
-  },[user])
+  },[user.rooms])
 
   useEffect(() => {
     if (user._id && user.rooms.length > 0) {
@@ -84,9 +82,9 @@ const Chats = () => {
       setShowUserInfoModal(true)
     }
     else if(s.label === 'Logout'){
-      removeCookie('userInfo');
-      navigate('/login')
+      authService.logout();
       dispatch(logout())
+      navigate('/login')
     }
     setShowDropdown(false)
   }
@@ -106,16 +104,6 @@ const Chats = () => {
     // console.log('joinRoom called')
     socket.emit('joinRoom', user._id, user.rooms)
   }, [user._id, user.rooms])
-
-  useEffect(() => {
-    if (user._id && cookie.userInfo && JSON.stringify(user.rooms) !== JSON.stringify(cookie.userInfo.rooms)) {
-      const updatedCookie = {
-        ...cookie.userInfo,
-        rooms: [...user.rooms]
-      };
-      setCookie('userInfo', updatedCookie, { path: '/' });
-    }
-  }, [user.rooms, cookie.userInfo, setCookie, user._id]);
   
 
   useEffect(() => {
@@ -148,11 +136,9 @@ const Chats = () => {
       // console.log('userKicked event received for room:', roomId, 'user:', userId);
       if (user._id === userId) {
         dispatch(exitRoom(roomId));
-        const updatedRooms = cookie.userInfo.rooms.filter(
+        const updatedRooms = user.rooms.filter(
           (id) => id !== roomId
         );
-        const updatedCookie = { ...cookie.userInfo, rooms: updatedRooms };
-        setCookie('userInfo', updatedCookie, { path: '/' });
         // console.log('idharrrr', roomId, selectedRoom._id)
         if(roomId === selectedRoom._id){
           // console.log('reset room called')

@@ -3,18 +3,16 @@ import leftLogo from '../assets/loginPageImg.png'
 import logo from '../assets/logo.svg'
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useForm } from 'react-hook-form'
-import _fetch from '../fetch.js'
 import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../store/userSlice.js'
-import { useCookies } from 'react-cookie'
+import authService from '../services/authService.js'
 
 const SignupNew = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [cookie, setCookie] = useCookies('userInfo')
 
   const {
     register,
@@ -32,28 +30,25 @@ const SignupNew = () => {
     try {
       clearErrors();
       
-      const submitData = {
-        email: data.email,
-        name: data.username,
-        password: data.password
-      };
-
-      let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, 'POST', submitData)
-      let response = await res.json()
+      // Step 1: Signup
+      const signupResult = await authService.signup(data.email, data.username, data.password);
       
-      if(res.status === 200){
-        navigate('/chats')
-        dispatch(loginSuccess(response))
-        setCookie('userInfo', response, { path: '/' })
+      if (!signupResult.success) {
+        setError('root', { type: 'manual', message: signupResult.error });
+        return;
       }
-      else if(res.status === 409) {
-        setError('email', { type: 'manual', message: 'Email already exists. Please use a different email.' });
-      }
-      else if(res.status === 400) {
-        setError('root', { type: 'manual', message: 'Please check your input and try again.' });
-      }
-      else {
-        setError('root', { type: 'manual', message: 'Something went wrong. Please try again later.' });
+      
+      // Step 2: Get current user
+      const userResult = await authService.getCurrentUser();
+      
+      if (userResult.success && userResult.user) {
+        // Step 3: Hydrate Redux with user data
+        dispatch(loginSuccess(userResult.user));
+        
+        // Step 4: Navigate to chats
+        navigate('/chats');
+      } else {
+        setError('root', { type: 'manual', message: 'Failed to fetch user profile. Please try again.' });
       }
     } catch (error) {
       console.error('Signup error:', error);

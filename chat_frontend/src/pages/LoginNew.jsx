@@ -3,18 +3,16 @@ import leftLogo from '../assets/loginPageImg.png'
 import logo from '../assets/logo.svg'
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useForm } from 'react-hook-form'
-import _fetch from '../fetch.js'
 import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../store/userSlice.js'
-import { useCookies } from 'react-cookie'
+import authService from '../services/authService.js'
 
 const LoginNew = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [cookie, setCookie] = useCookies('userInfo')
 
   const {
     register,
@@ -31,22 +29,26 @@ const LoginNew = () => {
   const onSubmit = async (data) => {
     try {
       clearErrors();
-      let res = await _fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, 'POST', data)
-      let response = await res.json()
       
-      if(res.status === 200){
-        navigate('/chats')
-        dispatch(loginSuccess(response))
-        setCookie('userInfo', response, { path: '/' })
+      // Step 1: Login
+      const loginResult = await authService.login(data.email, data.password);
+      
+      if (!loginResult.success) {
+        setError('root', { type: 'manual', message: loginResult.error });
+        return;
       }
-      else if(res.status === 401) {
-        setError('root', { type: 'manual', message: 'Invalid email or password.' });
-      }
-      else if(res.status === 400) {
-        setError('root', { type: 'manual', message: 'Please check your input and try again.' });
-      }
-      else {
-        setError('root', { type: 'manual', message: 'Something went wrong. Please try again later.' });
+      
+      // Step 2: Get current user
+      const userResult = await authService.getCurrentUser();
+      
+      if (userResult.success && userResult.user) {
+        // Step 3: Hydrate Redux with user data
+        dispatch(loginSuccess(userResult.user));
+        
+        // Step 4: Navigate to chats
+        navigate('/chats');
+      } else {
+        setError('root', { type: 'manual', message: 'Failed to fetch user profile. Please try again.' });
       }
     } catch (error) {
       console.error('Login error:', error);
