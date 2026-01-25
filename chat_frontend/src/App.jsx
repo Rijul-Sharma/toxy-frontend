@@ -8,6 +8,7 @@ import Chats from './pages/chats.jsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { loginSuccess, setAuthLoading } from './store/userSlice.js'
 import authService from './services/authService.js'
+import InstallBanner from './components/InstallBanner.jsx'
 
 
 function App() {
@@ -69,14 +70,17 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={isAuthenticated ? <Navigate to="/chats" /> : <Navigate to="/login" />}/>
-        <Route path='/login' element={isAuthenticated ? <Navigate to="/chats" /> : <LoginNew />}/>
-        <Route path='/signup' element={isAuthenticated ? <Navigate to="/chats" /> : <SignupNew />}/>
-        <Route path='/chats' element={isAuthenticated ? <Chats/> : <Navigate to="/login" />}/>
-      </Routes>
-    </BrowserRouter>
+    <>
+      <InstallBanner />
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={isAuthenticated ? <Navigate to="/chats" /> : <Navigate to="/login" />}/>
+          <Route path='/login' element={isAuthenticated ? <Navigate to="/chats" /> : <LoginNew />}/>
+          <Route path='/signup' element={isAuthenticated ? <Navigate to="/chats" /> : <SignupNew />}/>
+          <Route path='/chats' element={isAuthenticated ? <Chats/> : <Navigate to="/login" />}/>
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }
 
